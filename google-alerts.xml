@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<stylesheet>
+  <entry>
+    <title>amazonfresh</title>
+    <link rel="self" href="https://www.google.com/alerts/feeds/03016667448555882041/10813419956796523147"/>
+  </entry>
+  <entry>
+    <title>beyond meat</title>
+    <link rel="self" href="https://www.google.com/alerts/feeds/03016667448555882041/18371980089906002277"/>
+  </entry>
+  <entry> 
+    <title>blue apron</title>
+    <link rel="self" href="https://www.google.com/alerts/feeds/03016667448555882041/1720301016679370235"/>
+  </entry>
+  <entry>
+    <title>caviar</title>
+    <link rel="self" href="https://www.google.com/alerts/feeds/03016667448555882041/2852354285058590663"/>
+  </entry>
+  <entry>
+    <title>chefsfeed</title>
+    <link rel="self" href="https://www.google.com/alerts/feeds/03016667448555882041/2201973290870339493"/>
+  </entry>
+</stylesheet>
