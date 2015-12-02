@@ -1,7 +1,7 @@
 {"korea":[
-  {"word": "lg"},
-  {"word": "samsung"},
-  {"word": "korea"},
-  {"word": "korean"},
-  {"word": "seoul"}
+  {"word": "lg",      "tier": 1},
+  {"word": "samsung", "tier": 1},
+  {"word": "korea",   "tier": 1},
+  {"word": "korean",  "tier": 1},
+  {"word": "seoul",   "tier": 1}
 ]}

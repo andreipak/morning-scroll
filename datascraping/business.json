@@ -1,12 +1,12 @@
 {"business":[
-  {"word": "IPO"},
-  {"word": "series"},
-  {"word": "launch"},
-  {"word": "partnership"},
-  {"word": "case"},
-  {"word": "ties up"},
-  {"word": "starts"},
-  {"word": "invest"},
-  {"word": "funding"},
-  {"word": "seed"}
+  {"word": "IPO",         "tier": 1},
+  {"word": "series",      "tier": 1},
+  {"word": "launch",      "tier": 1},
+  {"word": "partnership", "tier": 1},
+  {"word": "case",        "tier": 1},
+  {"word": "ties up",     "tier": 1},
+  {"word": "starts",      "tier": 1},
+  {"word": "invest",      "tier": 1},
+  {"word": "funding",     "tier": 1},
+  {"word": "seed",        "tier": 1}
 ]}

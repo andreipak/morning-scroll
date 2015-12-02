@@ -1,19 +1,22 @@
 import sys
-import feedparser
-import json
-from collections import defaultdict
+import feedparser # for parsing feeds
+import json # for reading json files
+from collections import defaultdict # for initialization
+from termcolor import colored # for savvy debugging
 
-feedlist = ["http://techcrunch.com/feed/"]
+feedlist = ["http://english.chosun.com/site/data/rss/rss.xml"] #["http://techcrunch.com/feed/","http://mashable.com/feed/"]
 
+# otherwise known as validators
 filternames = ["competitors",
              "korea",
-             "business"]
+             "business",
+             "industry"]
 data_of = defaultdict(list)
 PATH_TO_DATA = ""
 DATA_EXTENSION = ".json"
 
 entries_list = []
-entries_rejects = []
+entries_strength = defaultdict(int)
 
 DEBUG = False
 
@@ -38,6 +41,7 @@ def load_entries(url):
         unique = True
         for existing_entry in entries_list:
             if existing_entry.title == entry.title:
+                # no duplicates allowed
                 unique = False
                 break
         if unique:
@@ -48,9 +52,13 @@ def load_entries(url):
 def valid(entry):
     for fn in filternames:
         for filt in data_of[fn]:
-            if filt["word"] in entry.title.lower():
-                # print("I found "+filt["word"]+" in "+entry.title)
+            if filt["word"] in entry.title.lower(): # checks on lower case
+                sys.stdout.write(colored("\t" + entry.title, "green"))
+                print(" [" + filt["word"].upper() + "]")
+                print
                 return True
+    print("\t" + entry.title)
+    print
     return False
 
 # Displays the entries in a savvy manner
@@ -64,11 +72,8 @@ def main():
     # feedlist = read_feedlist("feedlist.txt")
     for url in feedlist:
         load_entries(url)
-    display(entries_list)
-    print("\nAnd now... \n")
     valid_entries_list = filter(valid, entries_list)
-    display(valid_entries_list)
-    print("\n\t200")
+    print("\t200")
     # return entries_list
 
 if __name__ == '__main__':
