@@ -3,20 +3,22 @@ import feedparser # for parsing feeds
 import json # for reading json files
 from collections import defaultdict # for initialization
 from termcolor import colored # for savvy debugging
+import schedule # for scheduled stuff
+import time
 
-feedlist = ["http://english.chosun.com/site/data/rss/rss.xml"] #["http://techcrunch.com/feed/","http://mashable.com/feed/"]
+feedlist = ["http://techcrunch.com/feed/"]
 
 # otherwise known as validators
-filternames = ["competitors",
-             "korea",
-             "business",
-             "industry"]
+filternames = [# "competitors",
+             # "korea",
+             "business"]#,
+             # "industry"]
 data_of = defaultdict(list)
 PATH_TO_DATA = ""
 DATA_EXTENSION = ".json"
 
 entries_list = []
-entries_strength = defaultdict(int)
+entries_weight = []
 
 DEBUG = False
 
@@ -46,6 +48,7 @@ def load_entries(url):
                 break
         if unique:
             entries_list.append(entry)
+            # entries_weight[entry.title][
     print(d.feed.title + ": Load Complete")
 
 # Returns true if entry is valid according to the filters
@@ -67,14 +70,22 @@ def display(entries):
         print("\t" + entry.title)
 
 # Fetch stuff
-def main():
-    init()
+def fetch():
     # feedlist = read_feedlist("feedlist.txt")
     for url in feedlist:
         load_entries(url)
     valid_entries_list = filter(valid, entries_list)
     print("\t200")
     # return entries_list
+
+def main():
+    init()
+    print("initiation complete")
+    fetch();
+    schedule.every().minutes.do(fetch)
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
 
 if __name__ == '__main__':
     main()

@@ -1,10 +1,10 @@
 {"industry": [
-  {"word": "food",       "tier": 1},
-  {"word": "delivery",   "tier": 1},
-  {"word": "meal",       "tier": 1},
-  {"word": "restaurant", "tier": 1},
-  {"word": "kitchen",    "tier": 1},
-  {"word": "dinner",     "tier": 1},
-  {"word": "lunch",      "tier": 1},
-  {"word": "breakfast",  "tier": 1}
+  {"word": "food",       "weight": 1},
+  {"word": "delivery",   "weight": 1},
+  {"word": "meal",       "weight": 1},
+  {"word": "restaurant", "weight": 1},
+  {"word": "kitchen",    "weight": 1},
+  {"word": "dinner",     "weight": 1},
+  {"word": "lunch",      "weight": 1},
+  {"word": "breakfast",  "weight": 1}
 ]}
