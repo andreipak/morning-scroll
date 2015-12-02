@@ -1,67 +1,27 @@
-import sys
-import feedparser
-import json
-from collections import defaultdict
+#!/usr/bin/env python
+#
+# Copyright 2007 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+import webapp2
+from datascraping.fetch import fetch
 
-feedlist = ["http://techcrunch.com/feed/"]
+class MainHandler(webapp2.RequestHandler):
+    def get(self):
+        fetch();
+        self.response.write('Hello world!')
 
-filternames = ["competitors"]#,
-             # "korea",
-             # "business"]
-data_of = defaultdict(dict)
-DATA_EXTENSION = ".json"
-
-entries_list = []
-entries_rejects = []
-
-# Loads the filters onto the data_of dictionary
-def init():
-    for filtername in filternames:
-        with open(filtername + DATA_EXTENSION) as data_file:
-            print(filtername)
-            dummy = json.load(data_file)
-            data_of = dummy[filtername]
-            dumb = data_of[filtername][1]
-            print(dumb['word'])
-
-# Loads the feeds onto the entries_list
-def load_entries(url):
-    d = feedparser.parse(url)
-    for entry in d.entries:
-        unique = True
-        for existing_entry in entries_list:
-            if existing_entry.title == entry.title:
-                unique = False
-                break
-        if unique:
-            entries_list.append(entry)
-    print(d.feed.title + ": Load Complete")
-
-# Returns true if entry is valid according to the filters
-def valid(entry):
-    for filtername in filternames:
-        for term in data_of[filtername]:
-            if term in entry.title.lower():
-                print("I found "+term+" in "+entry.title)
-                return True
-    return False
-
-# Displays the entries in a savvy manner
-def display(entries):
-    for entry in entries:
-        print("\t" + entry.title)
-
-def main():
-    init();
-    # feedlist = read_feedlist("feedlist.txt")
-    for url in feedlist:
-        load_entries(url)
-    display(entries_list)
-    print("\nAnd now... \n")
-    valid_entries_list = filter(valid, entries_list)
-    display(valid_entries_list)
-    print("\n\t200")
-
-# Boilerplate
-if __name__ == '__main__':
-    main()
+app = webapp2.WSGIApplication([
+    ('/', MainHandler)
+], debug=True)
