@@ -1,7 +1,7 @@
 {"korea":[
-  {"word": "lg",      "weight": 1},
-  {"word": "samsung", "weight": 1},
-  {"word": "korea",   "weight": 1},
-  {"word": "korean",  "weight": 1},
-  {"word": "seoul",   "weight": 1}
+  {"title": "lg",      "weight": 1},
+  {"title": "samsung", "weight": 1},
+  {"title": "korea",   "weight": 1},
+  {"title": "korean",  "weight": 1},
+  {"title": "seoul",   "weight": 1}
 ]}

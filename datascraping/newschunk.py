@@ -2,9 +2,10 @@ import sys
 
 class NewsChunk(object):
 
-    def __init__(self, entry, weight):
+    def __init__(self, entry):
         self.entry = entry
-        self.weight = weight
+        self.weight = 0
+        self.hitnames = []
 
     def getTitle(self):
         if type(self.entry) is dict:
@@ -14,9 +15,17 @@ class NewsChunk(object):
     def getEntry(self):
         return self.entry
 
+    def getHitnames(self):
+        return self.hitnames
+
     def getWeight(self):
         return self.weight
 
-    def sumWeightWith(self, otherNewsChunk):
-        if type(otherNewsChunk) is NewsChunk:
-            return self.getWeight() + otherNewsChunk.getWeight()
+    # hits are dictionaries, but what is added are hitnames
+    def addHit(self, hit):
+        if type(hit) is dict:
+            self.hitnames.append(hit["title"])
+            self.weight += hit["weight"]
+        else:
+            print("something")
+            return
