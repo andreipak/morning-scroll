@@ -8,41 +8,33 @@ import time
 from newschunk import NewsChunk
 import difflib # for getting rid of duplicate-like articles
 
-en_feedlist = []
-kr_feedlist = []
+feednames_src = "en_feednames"
+feednames = []
 
-# otherwise known as validators
-filternames = ["kr_competitors",
-        "competitors",
-        "kr_food",
-        "korea",
-        "business",
-        "industry"]
+hitlistnames_src = "en_hitlistnames"
+hitlistnames = []
+
 data_of = defaultdict(list)
 PATH_TO_DATA = ""
 DATA_EXTENSION = ".json"
 
 # archive_newschunks has everything, and newschunks has the recent stuff
-kr_newschunks = {}
-en_newschunks = {}
+newschunks = {}
 archive_newschunks = {}
 
 # Loads the filters onto the data_of dictionary
 def init():
-    with open('en_feedlist') as f:
-        # remember, just using = here won't reset the global variable
-        en_feedlist.extend(f.read().splitlines())
+    with open(feednames_src) as f:
+        feednames.extend(f.read().splitlines())
 
-    with open('kr_feedlist') as f:
-        kr_feedlist.extend(f.read().splitlines())
+    with open(hitlistnames_src) as f:
+        hitlistnames.extend(f.read().splitlines())
 
-    print("== hitfiles ==")
-
-    for filtername in filternames:
-        print(filtername)
-        with open(PATH_TO_DATA + filtername + DATA_EXTENSION) as data_file:
+    for hitlistname in hitlistnames:
+        print(hitlistname)
+        with open(PATH_TO_DATA + hitlistname + DATA_EXTENSION) as data_file:
             tmp = json.load(data_file)
-            data_of[filtername] = tmp[filtername]
+            data_of[hitlistname] = tmp[hitlistname]
             # data_of is now a proper dictionary of list of dictionaries!
             # Valid use would be 'data_of[filtername][index]["title"]'
             # or for competitors, 'data_of[filtername][index]["tier"]' works too!
@@ -50,20 +42,14 @@ def init():
 
 # should make a class for newschunks...
 def add_nc(new_nc):
-    if new_nc.getLanguage() == "en":
-        en_newschunks[new_nc.getTitle()] = new_nc
-    else:
-        kr_newschunks[new_nc.getTitle()] = new_nc
+    newschunks[new_nc.getTitle()] = new_nc
     archive_newschunks[new_nc.getTitle()] = new_nc
 
 # deletes a newschunk from the dictionary (also deletes the key)
 def del_nc(old_nc):
     # del the original
     if old_nc is not None:
-        if old_nc.getLanguage() == "en":
-            en_newschunks.pop(old_nc.getTitle())
-        else:
-            kr_newschunks.pop(old_nc.getTitle())
+        newschunks.pop(old_nc.getTitle())
         archive_newschunks.pop(old_nc.getTitle())
     else:
         print("ERROR: Could not delete properly")
@@ -73,7 +59,7 @@ def del_nc(old_nc):
 DUPLICATE_THRESHOLD = 0.44
 
 # Loads the feeds onto the newschunks (language is either "kr" or "en")
-def load_newschunks(url, language):
+def load_newschunks(url):
     d = feedparser.parse(url)
     for entry in d.entries:
         ratio = 0
@@ -91,8 +77,8 @@ def load_newschunks(url, language):
                 match_nc = archive_newschunks[existing_title]
                 break
 
-        new_nc = NewsChunk(entry, language)
-        for fn in filternames:
+        new_nc = NewsChunk(entry)
+        for fn in data_of:
             for hit in data_of[fn]:
                 if hit["title"] in entry.title.lower(): # it's a hit!
                     new_nc.addHit(hit)
@@ -168,27 +154,17 @@ def print_info(newschunks):
 # Fetch stuff
 def fetch():
     # feedlist = read_feedlist("feedlist.txt")
-    for url in en_feedlist:
-        load_newschunks(url, "en")
+    for url in feednames:
+        load_newschunks(url)
 
-    for url in kr_feedlist:
-        load_newschunks(url, "kr")
     print
 
-    if len(kr_newschunks) > 0:
-        print("\tKOREAN")
+    if len(newschunks) > 0:
         print
-        print_info(kr_newschunks)
+        print_info(newschunks)
         # newschunks show what to print during scheduling
-        kr_newschunks.clear()
+        newschunks.clear()
 
-    if len(en_newschunks) > 0:
-        print("\tENGLISH")
-        print
-        print_info(en_newschunks)
-        # newschunks show what to print during scheduling
-        en_newschunks.clear()
-        
     print("\t200")
     print
 

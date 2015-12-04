@@ -3,11 +3,10 @@ from termcolor import colored
 
 class NewsChunk(object):
 
-    def __init__(self, entry, language):
+    def __init__(self, entry):
         self.entry = entry
         self.weight = 0
         self.hitnames = []
-        self.language = language
 
     def getTitle(self):
         return self.entry["title"]
@@ -21,8 +20,6 @@ class NewsChunk(object):
     def getWeight(self):
         return self.weight
 
-    def getLanguage(self):
-        return self.language
 
     # hits are dictionaries, but what is added are hitnames
     def addHit(self, hit):
@@ -46,7 +43,7 @@ class NewsChunk(object):
         importantColor = "red"
         hitColor = "yellow"
         weightColor = "green"
-        
+
         if self.getWeight() > 0:
             sys.stdout.write(colored("     [", weightColor))
             sys.stdout.write(colored(str(self.getWeight()), weightColor))
