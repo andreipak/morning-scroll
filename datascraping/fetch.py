@@ -48,6 +48,26 @@ def init():
             # or for competitors, 'data_of[filtername][index]["tier"]' works too!
     print
 
+# should make a class for newschunks...
+def add_nc(new_nc):
+    if new_nc.getLanguage() == "en":
+        en_newschunks[new_nc.getTitle()] = new_nc
+    else:
+        kr_newschunks[new_nc.getTitle()] = new_nc
+    archive_newschunks[new_nc.getTitle()] = new_nc
+
+# deletes a newschunk from the dictionary (also deletes the key)
+def del_nc(old_nc):
+    # del the original
+    if old_nc is not None:
+        if old_nc.getLanguage() == "en":
+            en_newschunks.pop(old_nc.getTitle())
+        else:
+            kr_newschunks.pop(old_nc.getTitle())
+        archive_newschunks.pop(old_nc.getTitle())
+    else:
+        print("ERROR: Could not delete properly")
+
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
 # more
 DUPLICATE_THRESHOLD = 0.44
@@ -57,7 +77,7 @@ def load_newschunks(url, language):
     d = feedparser.parse(url)
     for entry in d.entries:
         ratio = 0
-        unique = True
+        match_nc = None
         for existing_title in archive_newschunks:
             # checks for duplicates with sequence matcher
             # quick_ratio is an option if it gets too slow, but really fetching
@@ -68,19 +88,22 @@ def load_newschunks(url, language):
                 #     print(entry.title)
                 #     print(existing_title)
                 #     print(ratio)
-                unique = False
+                match_nc = archive_newschunks[existing_title]
                 break
-        if unique:
-            new_nc = NewsChunk(entry, language)
-            for fn in filternames:
-                for hit in data_of[fn]:
-                    if hit["title"] in entry.title.lower(): # it's a hit!
-                        new_nc.addHit(hit)
-            if language == "en":
-                en_newschunks[entry.title] = new_nc
-            else:
-                kr_newschunks[entry.title] = new_nc
-            archive_newschunks[entry.title] = new_nc
+
+        new_nc = NewsChunk(entry, language)
+        for fn in filternames:
+            for hit in data_of[fn]:
+                if hit["title"] in entry.title.lower(): # it's a hit!
+                    new_nc.addHit(hit)
+
+        if match_nc is None:
+            add_nc(new_nc)
+        elif new_nc.getWeight() > match_nc.getWeight():
+            # similar, but more important
+            del_nc(match_nc)
+            add_nc(new_nc)
+
     print(d.feed.title + ": Load Complete")
 
 PRINT_ALL = False
