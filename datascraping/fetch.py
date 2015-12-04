@@ -7,11 +7,13 @@ import schedule # for scheduled stuff
 import time
 from newschunk import NewsChunk
 
-feedlist = ["http://techcrunch.com/feed/", "http://mashable.com/feed",
-        "https://venturebeat.com/feed/"]
+feedlist = ["http://newssearch.naver.com/search.naver?where=rss&query=%B9%E8%B4%DE+%BE%DB&field=0",
+"http://techcrunch.com/feed/"]#, "http://mashable.com/feed",
+        # "https://venturebeat.com/feed/"]
 
 # otherwise known as validators
-filternames = [ "competitors",
+filternames = ["kr_competitors",
+             "competitors",
              "korea",
              "business",
              "industry"]
@@ -23,8 +25,6 @@ entries_list = []
 newschunks = {}
 archive_newschunks = {}
 
-DEBUG = False
-
 # Loads the filters onto the data_of dictionary
 def init():
     for filtername in filternames:
@@ -34,10 +34,6 @@ def init():
             # data_of is now a proper dictionary of list of dictionaries!
             # Valid use would be 'data_of[filtername][index]["title"]'
             # or for competitors, 'data_of[filtername][index]["tier"]' works too!
-        if DEBUG:
-            for fn in filternames:
-                for entry in data_of[fn]:
-                    print entry["title"]
 
 # Loads the feeds onto the newschunks
 def load_newschunks(url):

@@ -3,7 +3,7 @@
   {"title": "blue apron",    "weight": 3},
   {"title": "caviar",        "weight": 3},
   {"title": "daojia",        "weight": 3},
-  {"title": "deliv",         "weight": 3},
+  {"title": "deliv ",        "weight": 3},
   {"title": "deliveroo",     "weight": 3},
   {"title": "delivery hero", "weight": 3},
   {"title": "doordash",      "weight": 3},
@@ -31,7 +31,7 @@
   {"title": "thistle",       "weight": 3},
   {"title": "tinyowl",       "weight": 3},
   {"title": "take eat easy", "weight": 3},
-  {"title": "uber",          "weight": 2},
+  {"title": "uber ",         "weight": 2},
   {"title": "ubereats",      "weight": 3},
   {"title": "uberrush",      "weight": 2},
   {"title": "zomato",        "weight": 3}

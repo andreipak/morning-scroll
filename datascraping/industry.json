@@ -6,5 +6,6 @@
   {"title": "kitchen",    "weight": 2},
   {"title": "dinner",     "weight": 2},
   {"title": "lunch",      "weight": 2},
+  {"title": "on-demand",      "weight": 2},
   {"title": "breakfast",  "weight": 2}
 ]}
