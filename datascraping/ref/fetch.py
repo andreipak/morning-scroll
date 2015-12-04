@@ -188,59 +188,17 @@ def fetch():
         print_info(en_newschunks)
         # newschunks show what to print during scheduling
         en_newschunks.clear()
-
+        
     print("\t200")
     print
 
-def bring_empty_buckets():
-    bkts                 = {}
-    bkts["en_show"]      = []
-    bkts["en_debatable"] = []
-    bkts["en_trash"]     = []
-    bkts["kr_show"]      = []
-    bkts["kr_debatable"] = []
-    bkts["kr_trash"]     = []
-    return bkts
-
-def make_bucket_rules():
-    
-
-# Metaphor                               | Code
-# ---------------------------------------|------------------------------------------------
-# 1. Bring some empty buckets            | create dictionary of lists
-# 2. Order some balls                    | parse feed, create list of entries
-# 3. Go through every rule               | decide weights
-# 3. Label the balls                     | initialize label functions with weight, language
-# 4. Toss balls into buckets             | label the entries into the dictionary
-# 5. Spill the buckets to see the balls. | generate feeds
-
 def main():
-    # a bucket is a list of entries
-    # a bucket has a name
-    # so buckets is a dictionary, with bucket name as key and bucket as value
-    buckets = bring_empty_buckets()
-
-    # rules is a json file of all the possible hit
-    rules = make_bucket_rules();
-
-    # an ball is an entry from feedparser API
-    # so balls is a list of entries (same type as a bucket, think of entries
-    # as raw and unsorted)
-    balls = order_balls()
-
-    # tosses balls into corresponding buckets
-    toss(rules, balls, #into
-            buckets)
-
-    # spills balls (generate rss feeds)
-    spill(buckets)
-
-    # init()
-    # fetch()
-    # schedule.every(10).minutes.do(fetch)
-    # while 1:
-    #     schedule.run_pending()
-    #     time.sleep(1)
+    init()
+    fetch()
+    schedule.every(10).minutes.do(fetch)
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
 
 if __name__ == '__main__':
     main()
