@@ -1,4 +1,5 @@
 import sys
+from termcolor import colored
 
 class NewsChunk(object):
 
@@ -8,9 +9,7 @@ class NewsChunk(object):
         self.hitnames = []
 
     def getTitle(self):
-        if type(self.entry) is dict:
-            return self.entry["title"]
-        return None
+        return self.entry["title"]
 
     def getEntry(self):
         return self.entry
@@ -29,3 +28,31 @@ class NewsChunk(object):
         else:
             print("something")
             return
+
+    showWeight = 3
+    def worthShowing(self):
+        if self.weight >= 3:
+            return True
+        else:
+            return False
+
+    def print_info(self):
+        if self.getWeight() > 0:
+            sys.stdout.write(colored("     [", "green"))
+            sys.stdout.write(colored(str(self.getWeight()), "green"))
+            sys.stdout.write(colored("] ", "green"))
+
+        if self.worthShowing():
+            sys.stdout.write(colored(self.getTitle(), "red"))
+        elif self.getWeight() > 0:
+            sys.stdout.write(self.getTitle())
+        else:
+            sys.stdout.write("\t" + self.getTitle())
+
+        if self.getWeight() > 0:
+            sys.stdout.write(colored(" ( ", "grey"))
+            for hitname in self.getHitnames():
+                sys.stdout.write(colored(hitname.upper(), "grey"))
+                sys.stdout.write(colored(" ", "grey"))
+            sys.stdout.write(colored(")", "grey"))
+        print

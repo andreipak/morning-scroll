@@ -9,8 +9,8 @@ from newschunk import NewsChunk
 import difflib # for getting rid of duplicate-like articles
 
 feedlist = ["http://newssearch.naver.com/search.naver?where=rss&query=%B9%E8%B4%DE+%BE%DB&field=0",
-"http://techcrunch.com/feed/"]#, "http://mashable.com/feed",
-        # "https://venturebeat.com/feed/"]
+"http://techcrunch.com/feed/", "http://mashable.com/feed",
+        "https://venturebeat.com/feed/"]
 
 # otherwise known as validators
 filternames = ["kr_competitors",
@@ -59,7 +59,6 @@ def load_newschunks(url):
                 unique = False
                 break
         if unique:
-            print(ratio)
             new_nc = NewsChunk(entry)
             for fn in filternames:
                 for hit in data_of[fn]:
@@ -70,20 +69,41 @@ def load_newschunks(url):
     print(d.feed.title + ": Load Complete")
 
 def print_newschunks():
+    notImportant = []
+    almostImportant = []
+    important = []
     for title in newschunks:
         nc = newschunks[title]
-        if nc.getWeight() < 3:
-            sys.stdout.write("\t" + title)
+        if nc.worthShowing():
+            important.append(nc)
+        elif nc.getWeight() > 0:
+            almostImportant.append(nc)
         else:
-            sys.stdout.write(colored("\t" + title, "red"))
+            notImportant.append(nc)
 
-        if nc.getWeight() > 0:
-            sys.stdout.write(colored(" [ ", "green"))
-            for hitname in nc.getHitnames():
-                sys.stdout.write(colored(hitname.upper(), "green"))
-                sys.stdout.write(colored(" ", "green"))
-            sys.stdout.write(colored("]", "green"))
-            sys.stdout.write(colored(" [score: "+str(nc.getWeight())+"]", "green"))
+    # sorts by weight
+    almostImportant.sort(key=lambda x: x.getWeight(), reverse=False)
+    important.sort(key=lambda x: x.getWeight(), reverse=False)
+
+    if len(notImportant) > 0:
+        for nimp in notImportant:
+            nimp.print_info()
+        print
+        print("\t---------------------------------------")
+        print
+
+    if len(almostImportant) > 0:
+        for almostimp in almostImportant:
+            almostimp.print_info()
+        print
+        print("\t---------------------------------------")
+        print
+
+    if len(important) > 0:
+        for imp in important:
+            imp.print_info()
+        print
+        print("\t---------------------------------------")
         print
 
 # Returns true if entry is valid according to the filters
@@ -109,20 +129,20 @@ def fetch():
     # feedlist = read_feedlist("feedlist.txt")
     for url in feedlist:
         load_newschunks(url)
-    print_newschunks()
-    # newschunks show what to print during scheduling
-    newschunks.clear()
+    if len(newschunks) > 0:
+        print_newschunks()
+        # newschunks show what to print during scheduling
+        newschunks.clear()
     print("\t200")
 
 def main():
     init()
     print("initiation complete")
     fetch()
-    fetch()
-    # schedule.every().minutes.do(fetch)
-    # while 1:
-    #     schedule.run_pending()
-    #     time.sleep(1)
+    schedule.every(10).minutes.do(fetch)
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
 
 if __name__ == '__main__':
     main()
