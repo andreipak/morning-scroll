@@ -6,6 +6,7 @@ from termcolor import colored # for savvy debugging
 import schedule # for scheduled stuff
 import time
 from newschunk import NewsChunk
+import difflib # for getting rid of duplicate-like articles
 
 feedlist = ["http://newssearch.naver.com/search.naver?where=rss&query=%B9%E8%B4%DE+%BE%DB&field=0",
 "http://techcrunch.com/feed/"]#, "http://mashable.com/feed",
@@ -21,7 +22,7 @@ data_of = defaultdict(list)
 PATH_TO_DATA = ""
 DATA_EXTENSION = ".json"
 
-entries_list = []
+# archive_newschunks has everything, and newschunks has the recent stuff
 newschunks = {}
 archive_newschunks = {}
 
@@ -35,20 +36,37 @@ def init():
             # Valid use would be 'data_of[filtername][index]["title"]'
             # or for competitors, 'data_of[filtername][index]["tier"]' works too!
 
+# 0.44 seems to catch most things, could be improved by weighting our hit-terms
+# more
+DUPLICATE_THRESHOLD = 0.44
+
 # Loads the feeds onto the newschunks
 def load_newschunks(url):
     d = feedparser.parse(url)
     for entry in d.entries:
-        if archive_newschunks.get(entry.title) is not None:
-            # no duplicates allowed
-            break
-        else:
+        ratio = 0
+        unique = True
+        for existing_title in archive_newschunks:
+            # checks for duplicates with sequence matcher
+            # quick_ratio is an option if it gets too slow, but really fetching
+            # is the bottleneck
+            ratio = difflib.SequenceMatcher(None, entry.title, existing_title).ratio()
+            if ratio > DUPLICATE_THRESHOLD:
+                # if ratio < 1.0:
+                #     print(entry.title)
+                #     print(existing_title)
+                #     print(ratio)
+                unique = False
+                break
+        if unique:
+            print(ratio)
             new_nc = NewsChunk(entry)
             for fn in filternames:
                 for hit in data_of[fn]:
                     if hit["title"] in entry.title.lower(): # it's a hit!
                         new_nc.addHit(hit)
             newschunks[entry.title] = new_nc
+            archive_newschunks[entry.title] = new_nc
     print(d.feed.title + ": Load Complete")
 
 def print_newschunks():
@@ -91,23 +109,20 @@ def fetch():
     # feedlist = read_feedlist("feedlist.txt")
     for url in feedlist:
         load_newschunks(url)
-    for title in newschunks:
-        nc = newschunks[title]
-        if archive_newschunks.get(title) is None:
-            archive_newschunks[title] = nc
     print_newschunks()
+    # newschunks show what to print during scheduling
     newschunks.clear()
     print("\t200")
-    # return entries_list
 
 def main():
     init()
     print("initiation complete")
-    fetch();
-    schedule.every().minutes.do(fetch)
-    while 1:
-        schedule.run_pending()
-        time.sleep(1)
+    fetch()
+    fetch()
+    # schedule.every().minutes.do(fetch)
+    # while 1:
+    #     schedule.run_pending()
+    #     time.sleep(1)
 
 if __name__ == '__main__':
     main()
