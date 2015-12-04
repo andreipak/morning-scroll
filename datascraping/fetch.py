@@ -8,40 +8,52 @@ import time
 from newschunk import NewsChunk
 import difflib # for getting rid of duplicate-like articles
 
-feedlist = ["http://newssearch.naver.com/search.naver?where=rss&query=%B9%E8%B4%DE+%BE%DB&field=0",
-"http://techcrunch.com/feed/", "http://mashable.com/feed",
-        "https://venturebeat.com/feed/"]
+en_feedlist = []
+kr_feedlist = []
 
 # otherwise known as validators
 filternames = ["kr_competitors",
-             "competitors",
-             "korea",
-             "business",
-             "industry"]
+        "competitors",
+        "kr_food",
+        "korea",
+        "business",
+        "industry"]
 data_of = defaultdict(list)
 PATH_TO_DATA = ""
 DATA_EXTENSION = ".json"
 
 # archive_newschunks has everything, and newschunks has the recent stuff
-newschunks = {}
+kr_newschunks = {}
+en_newschunks = {}
 archive_newschunks = {}
 
 # Loads the filters onto the data_of dictionary
 def init():
+    with open('en_feedlist') as f:
+        # remember, just using = here won't reset the global variable
+        en_feedlist.extend(f.read().splitlines())
+
+    with open('kr_feedlist') as f:
+        kr_feedlist.extend(f.read().splitlines())
+
+    print("== hitfiles ==")
+
     for filtername in filternames:
+        print(filtername)
         with open(PATH_TO_DATA + filtername + DATA_EXTENSION) as data_file:
             tmp = json.load(data_file)
             data_of[filtername] = tmp[filtername]
             # data_of is now a proper dictionary of list of dictionaries!
             # Valid use would be 'data_of[filtername][index]["title"]'
             # or for competitors, 'data_of[filtername][index]["tier"]' works too!
+    print
 
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
 # more
 DUPLICATE_THRESHOLD = 0.44
 
-# Loads the feeds onto the newschunks
-def load_newschunks(url):
+# Loads the feeds onto the newschunks (language is either "kr" or "en")
+def load_newschunks(url, language):
     d = feedparser.parse(url)
     for entry in d.entries:
         ratio = 0
@@ -59,16 +71,20 @@ def load_newschunks(url):
                 unique = False
                 break
         if unique:
-            new_nc = NewsChunk(entry)
+            new_nc = NewsChunk(entry, language)
             for fn in filternames:
                 for hit in data_of[fn]:
                     if hit["title"] in entry.title.lower(): # it's a hit!
                         new_nc.addHit(hit)
-            newschunks[entry.title] = new_nc
+            if language == "en":
+                en_newschunks[entry.title] = new_nc
+            else:
+                kr_newschunks[entry.title] = new_nc
             archive_newschunks[entry.title] = new_nc
     print(d.feed.title + ": Load Complete")
 
-def print_newschunks():
+PRINT_ALL = False
+def print_info(newschunks):
     notImportant = []
     almostImportant = []
     important = []
@@ -85,12 +101,14 @@ def print_newschunks():
     almostImportant.sort(key=lambda x: x.getWeight(), reverse=False)
     important.sort(key=lambda x: x.getWeight(), reverse=False)
 
-    if len(notImportant) > 0:
-        for nimp in notImportant:
-            nimp.print_info()
-        print
-        print("\t---------------------------------------")
-        print
+    if PRINT_ALL:
+        # activate for algorithm optimization, floods the stuff a lot
+        if len(notImportant) > 0:
+            for nimp in notImportant:
+                nimp.print_info()
+            print
+            print("\t---------------------------------------")
+            print
 
     if len(almostImportant) > 0:
         for almostimp in almostImportant:
@@ -127,17 +145,32 @@ def print_newschunks():
 # Fetch stuff
 def fetch():
     # feedlist = read_feedlist("feedlist.txt")
-    for url in feedlist:
-        load_newschunks(url)
-    if len(newschunks) > 0:
-        print_newschunks()
+    for url in en_feedlist:
+        load_newschunks(url, "en")
+
+    for url in kr_feedlist:
+        load_newschunks(url, "kr")
+    print
+
+    if len(kr_newschunks) > 0:
+        print("\tKOREAN")
+        print
+        print_info(kr_newschunks)
         # newschunks show what to print during scheduling
-        newschunks.clear()
+        kr_newschunks.clear()
+
+    if len(en_newschunks) > 0:
+        print("\tENGLISH")
+        print
+        print_info(en_newschunks)
+        # newschunks show what to print during scheduling
+        en_newschunks.clear()
+        
     print("\t200")
+    print
 
 def main():
     init()
-    print("initiation complete")
     fetch()
     schedule.every(10).minutes.do(fetch)
     while 1:
