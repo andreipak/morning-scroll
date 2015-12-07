@@ -10,8 +10,8 @@ import difflib # for getting rid of duplicate-like articles
 import datetime
 import libs.PyRSS2Gen # for generating feed
 
-feednames_src = "metalists/en_feednames"
-hitlistnames_src = "metalists/en_hitlistnames"
+feednames_src = "metalists/kr_feednames"
+hitlistnames_src = "metalists/kr_hitlistnames"
 PATH_TO_DATA = "hitlists/"
 DATA_EXTENSION = ".json"
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
@@ -166,7 +166,7 @@ class DataScraper(object):
             ))
 
         rss = libs.PyRSS2Gen.RSS2(
-                title = "The Feed, yo",
+                title = "The Feed, y",
                 link = "https://morning-scroll.appspot.com",
                 description = "This is a feed",
 

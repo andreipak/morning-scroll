@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
 import webapp2
 import cgi
 from datascraping.datascraper import DataScraper
