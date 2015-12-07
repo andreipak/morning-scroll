@@ -15,12 +15,20 @@
 # limitations under the License.
 #
 import webapp2
-from datascraping.fetch import fetch
+import cgi
+from datascraping.datascraper import DataScraper
+
+
 
 class MainHandler(webapp2.RequestHandler):
+    def __init__(self, request, response):
+        self.initialize(request, response)
+        self.datascraper = DataScraper()
+        self.datascraper.fetch()
+
     def get(self):
-        fetch();
-        self.response.write('Hello world!')
+        self.response.write(cgi.escape(self.datascraper.generate_feed()))
+        # self.response.write("Hello")
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler)

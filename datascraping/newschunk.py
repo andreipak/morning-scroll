@@ -1,5 +1,5 @@
 import sys
-from termcolor import colored
+from libs.termcolor import colored
 
 class NewsChunk(object):
 
