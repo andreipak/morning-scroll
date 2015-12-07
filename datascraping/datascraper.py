@@ -10,8 +10,8 @@ import difflib # for getting rid of duplicate-like articles
 import datetime
 import libs.PyRSS2Gen # for generating feed
 
-feednames_src = "en_feednames"
-hitlistnames_src = "en_hitlistnames"
+feednames_src = "metalists/en_feednames"
+hitlistnames_src = "metalists/en_hitlistnames"
 PATH_TO_DATA = "hitlists/"
 DATA_EXTENSION = ".json"
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
@@ -154,8 +154,8 @@ class DataScraper(object):
         items = []
         for title in self.archive_newschunks:
             nc = self.archive_newschunks[title]
-            if not nc.worthShowing():
-                continue
+            # if not nc.worthShowing():
+            #     continue
             x = nc.getEntry()
             items.append(libs.PyRSS2Gen.RSSItem(
                 title = x.title,
@@ -173,7 +173,7 @@ class DataScraper(object):
                 language = "en",
                 copyright = "",
                 pubDate = datetime.datetime.now(),
-                lastBuildDate = "",
+                lastBuildDate = datetime.datetime.now(),
 
                 categories = "",
                 generator = "",

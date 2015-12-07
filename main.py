@@ -27,7 +27,7 @@ class MainHandler(webapp2.RequestHandler):
         self.datascraper.fetch()
 
     def get(self):
-        self.response.write(cgi.escape(self.datascraper.generate_feed()))
+        self.response.write(self.datascraper.generate_feed())
         # self.response.write("Hello")
 
 app = webapp2.WSGIApplication([
