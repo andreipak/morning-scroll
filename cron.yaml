@@ -1,4 +1,4 @@
 cron:
 - description: fetch
-  url: /tasks/
+  url: /fetch
   schedule: every 1 mins

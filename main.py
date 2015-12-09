@@ -20,18 +20,30 @@ reload(sys)
 import webapp2
 import cgi
 import feedparser
-from datascraper import DataScraper
+import datascraper
+
+# some constants regarding directories
+PATH_TO_HITLISTS = "hitlists/"
+HITLIST_EXTENSION = ".json"
+PATH_TO_METALISTS = "metalists/"
+KOREAN = True
+ENGLISH = False
+
+def fetch(IS_KOREAN):
+    if IS_KOREAN:
+        datascraper.fetch(PATH_TO_METALISTS + "kr_feednames", PATH_TO_METALISTS + "kr_hitlistnames")
+    else:
+        datascraper.fetch(PATH_TO_METALISTS + "en_feednames", PATH_TO_METALISTS + "en_hitlistnames")
+
+class FetchHandler(webapp2.RequestHandler):
+    def get(self):
+        fetch(KOREAN)
+        fetch(ENGLISH)
 
 class MainHandler(webapp2.RequestHandler):
-    def __init__(self, request, response):
-        self.initialize(request, response)
-        self.datascraper = DataScraper()
-        self.datascraper.fetch()
-
     def get(self):
-        self.response.write(self.datascraper.generate_feed())
-        # self.response.write("Hello")
+        self.response.write(datascraper.generate_feed())
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/', MainHandler), ('/fetch', FetchHandler)
 ], debug=True)

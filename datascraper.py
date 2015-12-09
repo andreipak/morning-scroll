@@ -7,7 +7,9 @@ import feedparser # parse rss feeds from news sites
 import json # read local hitlist datafiles
 
 import difflib # determine duplicate-like articles
-from newschunk import NewsChunk # datastore model containing entry, weight, and
+from newschunks import NewsChunks # datastore model containing entry, weight, and
+from google.appengine.ext import db
+
                                 # title
 import pickle # serialize (write to datastore) & deserialize (generate feed)
               # individual entries
@@ -23,127 +25,123 @@ import logging # debugging
 # some constants regarding directories
 PATH_TO_HITLISTS = "hitlists/"
 HITLIST_EXTENSION = ".json"
-PATH_TO_METALISTS = PATH_TO_HITLISTS + "metalists/"
+PATH_TO_METALISTS = "metalists/"
 
 # some constants, will be part of the object declaration
-feednames_src = "en_feednames"
-hitlistnames_src = "en_hitlistnames"
+feednames_src = PATH_TO_METALISTS + "en_feednames"
+hitlistnames_src = PATH_TO_METALISTS + "en_hitlistnames"
 
 # threshold for difflib calculation
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
 # more
 DUPLICATE_THRESHOLD = 0.44
 
-class DataScraper(object):
+def get_list_of(names_src):
+    names = []
+    with open(names_src) as f:
+        names.extend(f.read().splitlines())
+    return names
 
-    def __init__(self):
-        # initialize object data
-        self.feednames = []
-        self.hitlistnames = []
-        self.data_of = {}
+def get_hitlist_dict(hitlistnames_src):
+    # initialize object data
+    hitlist_dict = {}
+    hitlistnames = get_list_of(hitlistnames_src)
 
-        # this should also be datastored !!
-        self.archive_newschunks = {}
+    # Load hitlists from the names
+    for hitlistname in hitlistnames:
+        logging.debug(hitlistname)
+        with open(PATH_TO_HITLISTS + hitlistname + HITLIST_EXTENSION) as data_file:
+            tmp = json.load(data_file)
+            hitlist_dict[hitlistname] = tmp[hitlistname]
+            # this model exists for better weight algorithm in the future
+    return hitlist_dict
 
-        # Load feed names
-        with open(PATH_TO_METALISTS + feednames_src) as f:
-            self.feednames.extend(f.read().splitlines())
+def get_entries(url):
+    d = feedparser.parse(url)
+    logging.debug(d.feed.title + ": Loading...")
+    return d.entries
 
-        # Load hitlist names
-        with open(PATH_TO_METALISTS + hitlistnames_src) as f:
-            self.hitlistnames.extend(f.read().splitlines())
+# Loads the feeds onto the local (plan: language is either "kr" or "en")
+def load_newschunks(entries, hitlist_dict):
+    for new_entry in entries:
+        new_title = new_entry.title
 
-        # Load hitlists from the names
-        for hitlistname in self.hitlistnames:
-            logging.debug(hitlistname)
-            with open(PATH_TO_HITLISTS + hitlistname + HITLIST_EXTENSION) as data_file:
-                tmp = json.load(data_file)
-                self.data_of[hitlistname] = tmp[hitlistname]
-                # data_of is now a dictionary of list of newschunks
-                # this model exists for better weight algorithm in the future
+        match_nc = None
 
-    # Loads the feeds onto the local (plan: language is either "kr" or "en")
-    def load_newschunks(self, url):
-        d = feedparser.parse(url)
-        for new_entry in d.entries:
-            new_title = new_entry.title
+        q = db.Query(NewsChunks,keys_only=True)
 
-            match_title = ""
-            match_nc = None
+        for key in q:
+            existing_title = str(key)
+            logging.debug(existing_title)
+            # checks for duplicates with sequence matcher
+            ratio = difflib.SequenceMatcher(None, new_title, existing_title).ratio()
+            if ratio > DUPLICATE_THRESHOLD:
+                match_nc = NewsChunks.get(existing_title)
+                break
 
-            for existing_title in self.archive_newschunks:
-                # checks for duplicates with sequence matcher
-                ratio = difflib.SequenceMatcher(None, new_title, existing_title).ratio()
-                if ratio > DUPLICATE_THRESHOLD:
-                    match_title = existing_title
-                    match_nc = self.archive_newschunks[match_title]
-                    break
+        # serializes entry into entry_data
+        new_nc = NewsChunks(key_name=new_title, entry_data=pickle.dumps(new_entry))
 
-            # serializes entry into entry_data
-            new_nc = NewsChunk(entry_data=pickle.dumps(new_entry))
+        for hitlistname in hitlist_dict:
+            for hit in hitlist_dict[hitlistname]:
+                if hit["title"] in new_title.lower(): # it's a hit!
+                    new_nc.hitnames.append(hit["title"])
+                    new_nc.weight += hit["weight"]
 
-            for fn in self.data_of:
-                for hit in self.data_of[fn]:
-                    if hit["title"] in new_title.lower(): # it's a hit!
-                        new_nc.hitnames.append(hit["title"])
-                        new_nc.weight += hit["weight"]
+        if match_nc is None:
+            # unique nc
+            new_nc.put()
+        elif new_nc.weight > match_nc.weight:
+            # similar, but new_nc is heavier
+            match_nc.delete()
+            new_nc.put()
 
-            if match_nc is None:
-                # unique nc
-                self.archive_newschunks[new_title] = new_nc
-            elif new_nc.weight > match_nc.weight:
-                # similar, but new_nc is heavier
-                self.archive_newschunks.pop(match_title)
-                self.archive_newschunks[new_title] = new_nc
 
-        logging.debug(d.feed.title + ": Load Complete")
+# load all the feeds, then clear newschunks
+def fetch(feednames_src, hitlistnames_src):
+    feednames = get_list_of(feednames_src)
+    for url in feednames:
+        entries = get_entries(url)
+        hitlist_dict = get_hitlist_dict(hitlistnames_src)
+        load_newschunks(entries, hitlist_dict)
+        logging.debug("Done")
 
-    # load all the feeds, then clear newschunks
-    def fetch(self):
-        for url in self.feednames:
-            self.load_newschunks(url)
-        logging.debug("\t200")
+def generate_feed():
+    items = []
+    for nc in NewsChunks.all():
 
-    def generate_feed(self):
-        items = []
-        for title in self.archive_newschunks:
-            nc = self.archive_newschunks[title]
-            # must be added for quality results!
-            # if nc.weight < 3:
-            #     continue
-            x = pickle.loads(nc.entry_data)
-            items.append(PyRSS2Gen.RSSItem(
-                title = x.title,
-                link = x.link,
-                description = x.summary,
-                guid = x.link,
-                pubDate = x.published
-            ))
+        # must be added for quality results!
+        # if nc.weight < 3:
+        #     continue
 
-        rss = PyRSS2Gen.RSS2(
-                title = "The Feed, y",
-                link = "https://morning-scroll.appspot.com",
-                description = "This is a feed",
+        x = pickle.loads(nc.entry_data)
+        items.append(PyRSS2Gen.RSSItem(
+            title = x.title,
+            link = x.link,
+            description = x.summary,
+            guid = x.link,
+            pubDate = x.published
+        ))
 
-                language = "en",
-                copyright = "",
-                pubDate = datetime.now(),
-                lastBuildDate = datetime.now(),
+    # feed generation!
+    rss = PyRSS2Gen.RSS2(
+            title = "The Feed, y",
+            link = "https://morning-scroll.appspot.com",
+            description = "This is a feed",
 
-                categories = "",
-                generator = "",
-                docs = "https://validator.w3.org/feed/docs/rss2.html",
+            language = "en",
+            copyright = "",
+            pubDate = datetime.now(),
+            lastBuildDate = datetime.now(),
 
-                items = items
-        )
+            categories = "",
+            generator = "",
+            docs = "https://validator.w3.org/feed/docs/rss2.html",
 
-        return rss.to_xml()
+            items = items
+    )
 
-    def schedule_fetch(self):
-        schedule.every(10).minutes.do(self.fetch)
-        while 1:
-            schedule.run_pending()
-            time.sleep(1)
+    return rss.to_xml()
 
-    if __name__ == '__main__':
-        main()
+if __name__ == '__main__':
+    main()
