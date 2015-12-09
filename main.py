@@ -16,12 +16,11 @@
 #
 import sys
 reload(sys)
-sys.setdefaultencoding("utf-8")
+# sys.setdefaultencoding("utf-8")
 import webapp2
 import cgi
-from datascraping.datascraper import DataScraper
-
-
+import feedparser
+from datascraper import DataScraper
 
 class MainHandler(webapp2.RequestHandler):
     def __init__(self, request, response):
