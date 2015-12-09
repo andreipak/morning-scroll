@@ -57,9 +57,12 @@ def get_hitlist_dict(hitlistnames_src):
     return hitlist_dict
 
 def get_entries(url):
-    d = feedparser.parse(url)
-    logging.debug(d.feed.title + ": Loading...")
-    return d.entries
+    try:
+        rss = feedparser.parse(url)
+        logging.debug(rss.feed.title + ": Loading...")
+    except Exception as e:
+        logging.debug(str(e))
+    return rss.entries
 
 # Loads the feeds onto the local (plan: language is either "kr" or "en")
 def load_newschunks(entries, hitlist_dict):
@@ -95,7 +98,6 @@ def load_newschunks(entries, hitlist_dict):
             # similar, but new_nc is heavier
             match_nc.delete()
             new_nc.put()
-
 
 # load all the feeds, then clear newschunks
 def fetch(feednames_src, hitlistnames_src):
