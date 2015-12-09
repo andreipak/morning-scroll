@@ -106,13 +106,13 @@ def fetch(feednames_src, hitlistnames_src):
         load_newschunks(entries, hitlist_dict)
         logging.debug("Done")
 
-def generate_feed():
+def generate_feed(min_weight=3):
     items = []
     for nc in NewsChunks.all():
 
         # must be added for quality results!
-        # if nc.weight < 3:
-        #     continue
+        if nc.weight < min_weight:
+            continue
 
         x = pickle.loads(nc.entry_data)
         items.append(PyRSS2Gen.RSSItem(
@@ -141,7 +141,7 @@ def generate_feed():
             items = items
     )
 
-    return rss.to_xml()
+    return rss.to_xml(encoding="utf-8")
 
 if __name__ == '__main__':
     main()

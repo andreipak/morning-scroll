@@ -22,6 +22,26 @@ import cgi
 import feedparser
 import datascraper
 
+form="""
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Sign Up</title>
+  </head>
+
+  <body>
+    <h2>Signup</h2>
+    <form method="post">
+        Quantity (between 0 and 5):
+        <input type="number" name="minweight" min="0" max="5">
+        <input type="submit">
+    </form>
+  </body>
+
+</html>
+"""
+
 # some constants regarding directories
 PATH_TO_HITLISTS = "hitlists/"
 HITLIST_EXTENSION = ".json"
@@ -42,8 +62,17 @@ class FetchHandler(webapp2.RequestHandler):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write(datascraper.generate_feed())
+        self.response.out.write(form)
+
+    def post(self):
+        minweight = self.request.get('minweight')
+        self.redirect("/generation?minweight=%s"%minweight)
+
+class GenerationHandler(webapp2.RequestHandler):
+    def get(self):
+        minweight = self.request.get('minweight')
+        self.response.write(datascraper.generate_feed(int(minweight)))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler), ('/fetch', FetchHandler)
+    ('/', MainHandler), ('/fetch', FetchHandler), ('/generation', GenerationHandler)
 ], debug=True)
