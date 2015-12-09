@@ -1,24 +1,25 @@
-import sys
-import webapp2
-import feedparser
-import simplejson
-import json
-from collections import defaultdict # for initialization
-from termcolor import colored # for savvy debugging
-import schedule # for scheduled stuff
-import time
-from newschunk import NewsChunk
-import difflib # for getting rid of duplicate-like articles
-from datetime import datetime
-import PyRSS2Gen # for generating feed
-from google.appengine.ext import db
-import logging
-import pickle
+import feedparser # parse rss feeds from news sites
+import json # read local hitlist datafiles
 
-feednames_src = "metalists/en_feednames"
-hitlistnames_src = "metalists/en_hitlistnames"
-PATH_TO_DATA = "hitlists/"
-DATA_EXTENSION = ".json"
+import difflib # determine duplicate-like articles
+from newschunk import NewsChunk # datastore model
+import pickle # serialize (write to datastore) & deserialize (generate feed)
+              # individual entries
+
+import schedule # schedule fetches
+import time # adjunct to schedule
+
+import PyRSS2Gen # generate feed
+from datetime import datetime # publish current time for rss feed generation
+
+import logging # debugging
+
+PATH_TO_HITLISTS = "hitlists/"
+PATH_TO_METALISTS = "hitlists/metalists/"
+HITLIST_EXTENSION = ".json"
+
+feednames_src = "en_feednames"
+hitlistnames_src = "en_hitlistnames"
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
 # more
 DUPLICATE_THRESHOLD = 0.44
@@ -26,30 +27,34 @@ DUPLICATE_THRESHOLD = 0.44
 class DataScraper(object):
 
     def __init__(self):
+        # initialize object data
         self.feednames = []
         self.hitlistnames = []
-        self.data_of = defaultdict(list)
+        self.data_of = {}
 
         # archive_newschunks has everything, and newschunks has the recent stuff
         self.newschunks = {}
+
+        # this should also be datastored !!
         self.archive_newschunks = {}
 
-        # Loads the filters onto the self.data_of dictionary
-        with open(PATH_TO_DATA + feednames_src) as f:
+        # Load feed names
+        with open(PATH_TO_METALISTS + feednames_src) as f:
             self.feednames.extend(f.read().splitlines())
 
-        with open(PATH_TO_DATA + hitlistnames_src) as f:
+        # Load hitlist names
+        with open(PATH_TO_METALISTS + hitlistnames_src) as f:
             self.hitlistnames.extend(f.read().splitlines())
 
+        # Load hitlists
         for hitlistname in self.hitlistnames:
-            print(hitlistname)
-            with open(PATH_TO_DATA + hitlistname + DATA_EXTENSION) as data_file:
+            logging.debug(hitlistname)
+            with open(PATH_TO_HITLISTS + hitlistname + HITLIST_EXTENSION) as data_file:
                 tmp = json.load(data_file)
                 self.data_of[hitlistname] = tmp[hitlistname]
                 # data_of is now a proper dictionary of list of dictionaries!
                 # Valid use would be 'data_of[filtername][index]["title"]'
                 # or for competitors, 'data_of[filtername][index]["tier"]' works too!
-        print
 
     def add_nc(self, new_nc, title):
         self.newschunks[title] = new_nc
@@ -91,27 +96,22 @@ class DataScraper(object):
                 self.del_nc(match_nc, entry.title)
                 self.add_nc(new_nc, entry.title)
 
-        print(d.feed.title + ": Load Complete")
+        logging.debug(d.feed.title + ": Load Complete")
 
 
     # Fetch stuff
     def fetch(self):
-        # feedlist = read_feedlist("feedlist.txt")
         for url in self.feednames:
             self.load_newschunks(url)
-        print
-        print
-        # print_info(self.newschunks)
-        # newschunks show what to print during scheduling
         self.newschunks.clear()
-        print("\t200")
-        print
+        logging.debug("\t200")
 
     def generate_feed(self):
         items = []
         for title in self.archive_newschunks:
             nc = self.archive_newschunks[title]
-            # if not nc.worthShowing():
+            # must be added for quality results!
+            # if nc.weight < 3:
             #     continue
             x = pickle.loads(nc.entry_data)
             items.append(PyRSS2Gen.RSSItem(
