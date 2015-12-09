@@ -3,7 +3,6 @@
 # weight (int)      : weight of the entry
 # hitnames (list)   : hits that contributed to the weight
 from google.appengine.ext import db
-from google.appengine.api import users
 
 class NewsChunk(db.Model):
     entry_data = db.BlobProperty(required=True)
