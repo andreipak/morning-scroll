@@ -1,16 +1,16 @@
 import sys
 import webapp2
-import lib.feedparser
-import lib.simplejson
+import feedparser
+import simplejson
 import json
 from collections import defaultdict # for initialization
 from termcolor import colored # for savvy debugging
-import lib.schedule # for scheduled stuff
+import schedule # for scheduled stuff
 import time
 from newschunk import NewsChunk
 import difflib # for getting rid of duplicate-like articles
 from datetime import datetime
-import lib.PyRSS2Gen # for generating feed
+import PyRSS2Gen # for generating feed
 from google.appengine.ext import db
 import logging
 import pickle
@@ -64,7 +64,7 @@ class DataScraper(object):
 
     # Loads the feeds onto the newschunks (language is either "kr" or "en")
     def load_newschunks(self, url):
-        d = lib.feedparser.parse(url)
+        d = feedparser.parse(url)
         for entry in d.entries:
             ratio = 0
             match_nc = None
@@ -114,7 +114,7 @@ class DataScraper(object):
             # if not nc.worthShowing():
             #     continue
             x = pickle.loads(nc.entry_data)
-            items.append(lib.PyRSS2Gen.RSSItem(
+            items.append(PyRSS2Gen.RSSItem(
                 title = x.title,
                 link = x.link,
                 description = x.summary,
@@ -122,7 +122,7 @@ class DataScraper(object):
                 pubDate = x.published
             ))
 
-        rss = lib.PyRSS2Gen.RSS2(
+        rss = PyRSS2Gen.RSS2(
                 title = "The Feed, y",
                 link = "https://morning-scroll.appspot.com",
                 description = "This is a feed",
@@ -142,9 +142,9 @@ class DataScraper(object):
         return rss.to_xml()
 
     def schedule_fetch(self):
-        lib.schedule.every(10).minutes.do(self.fetch)
+        schedule.every(10).minutes.do(self.fetch)
         while 1:
-            lib.schedule.run_pending()
+            schedule.run_pending()
             time.sleep(1)
 
     if __name__ == '__main__':
