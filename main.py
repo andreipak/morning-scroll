@@ -40,7 +40,8 @@ class FetchHandler(webapp2.RequestHandler):
         fetch(KOREAN)
         fetch(ENGLISH)
 
-MINWEIGHT = 2
+MINWEIGHT = 3
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/rss+xml'

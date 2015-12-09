@@ -56,14 +56,6 @@ def get_hitlist_dict(hitlistnames_src):
             # this model exists for better weight algorithm in the future
     return hitlist_dict
 
-def get_entries(url):
-    try:
-        rss = feedparser.parse(url)
-        logging.debug(rss.feed.title + ": Loading...")
-    except Exception as e:
-        logging.debug(str(e))
-    return rss.entries
-
 # Loads the feeds onto the local (plan: language is either "kr" or "en")
 def load_newschunks(entries, hitlist_dict):
     for new_entry in entries:
@@ -102,11 +94,14 @@ def load_newschunks(entries, hitlist_dict):
 # load all the feeds, then clear newschunks
 def fetch(feednames_src, hitlistnames_src):
     feednames = get_list_of(feednames_src)
+    hitlist_dict = get_hitlist_dict(hitlistnames_src)
     for url in feednames:
-        entries = get_entries(url)
-        hitlist_dict = get_hitlist_dict(hitlistnames_src)
-        load_newschunks(entries, hitlist_dict)
-        logging.debug("Done")
+        try:
+            rss = feedparser.parse(url)
+            load_newschunks(rss.entries, hitlist_dict)
+            logging.debug("Done")
+        except Exception as e:
+            logging.debug(str(e))
 
 def generate_feed(min_weight=3):
     items = []
