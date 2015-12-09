@@ -66,7 +66,7 @@ class MainHandler(webapp2.RequestHandler):
 
     def post(self):
         minweight = self.request.get('minweight')
-        self.redirect("/generation?minweight=%s"%minweight)
+        self.redirect("/cgi-bin/feed2html.py?i=/generation?minweight=%s"%minweight)
 
 class GenerationHandler(webapp2.RequestHandler):
     def get(self):

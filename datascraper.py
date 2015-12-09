@@ -8,9 +8,9 @@ import json # read local hitlist datafiles
 
 import difflib # determine duplicate-like articles
 from newschunks import NewsChunks # datastore model containing entry, weight, and
+                                  # title
 from google.appengine.ext import db
 
-                                # title
 import pickle # serialize (write to datastore) & deserialize (generate feed)
               # individual entries
 
