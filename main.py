@@ -21,6 +21,7 @@ import webapp2
 import cgi
 import feedparser
 import datascraper
+import logging
 
 # some constants regarding directories
 PATH_TO_HITLISTS = "hitlists/"
@@ -31,9 +32,13 @@ ENGLISH = False
 
 def fetch(IS_KOREAN):
     if IS_KOREAN:
-        datascraper.fetch(PATH_TO_METALISTS + "kr_feednames", PATH_TO_METALISTS + "kr_hitlistnames")
+        datascraper.fetch(PATH_TO_METALISTS + "kr_feednames",
+                PATH_TO_METALISTS + "kr_hitlistnames_general",
+                PATH_TO_METALISTS + "kr_hitlistnames_exclusive")
     else:
-        datascraper.fetch(PATH_TO_METALISTS + "en_feednames", PATH_TO_METALISTS + "en_hitlistnames")
+        datascraper.fetch(PATH_TO_METALISTS + "en_feednames", 
+                PATH_TO_METALISTS + "en_hitlistnames_general",
+                PATH_TO_METALISTS + "en_hitlistnames_exclusive")
 
 class FetchHandler(webapp2.RequestHandler):
     def get(self):
@@ -45,7 +50,13 @@ MINWEIGHT = 3
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/rss+xml'
-        self.response.write(datascraper.generate_feed(MINWEIGHT))
+        # self.response.write(datascraper.generate_feed(MINWEIGHT))
+        self.response.write("\t\t\t\t\t==============IMPORTANT==============\n")
+        self.response.write(datascraper.generate_human_readable_feed(3, 10))
+        self.response.write("\n\t\t\t\t\t===========ALMOST IMPORTANT===========\n")
+        self.response.write(datascraper.generate_human_readable_feed(2, 3))
+        self.response.write("\n\t\t\t\t\t============NOT IMPORTANT============\n")
+        self.response.write(datascraper.generate_human_readable_feed(1, 2))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler), ('/fetch', FetchHandler)
