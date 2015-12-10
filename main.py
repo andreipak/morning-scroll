@@ -47,17 +47,23 @@ class FetchHandler(webapp2.RequestHandler):
 
 MINWEIGHT = 3
 
+class RSSHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.headers['Content-Type'] = 'application/rss+xml'
+        self.response.write(datascraper.generate_feed(MINWEIGHT))
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/rss+xml'
-        # self.response.write(datascraper.generate_feed(MINWEIGHT))
         self.response.write("\t\t\t\t\t==============IMPORTANT==============\n")
         self.response.write(datascraper.generate_human_readable_feed(3, 10))
         self.response.write("\n\t\t\t\t\t===========ALMOST IMPORTANT===========\n")
         self.response.write(datascraper.generate_human_readable_feed(2, 3))
         self.response.write("\n\t\t\t\t\t============NOT IMPORTANT============\n")
         self.response.write(datascraper.generate_human_readable_feed(1, 2))
+        self.response.write("\n\t\t\t\t\t==============DUPLICATES==============\n")
+        self.response.write(datascraper.generate_human_readable_feed(-1, 0))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler), ('/fetch', FetchHandler)
+    ('/', MainHandler), ('/rss', RSSHandler), ('/fetch', FetchHandler)
 ], debug=True)

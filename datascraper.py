@@ -118,7 +118,8 @@ def fetch(feednames_src, hitlistnames_general_src, hitlistnames_exclusive_src):
 
 def generate_feed(min_weight=3):
     items = []
-    for nc in NewsChunks.all():
+    q = db.Query(NewsChunks)
+    for nc in q:
 
         # must be added for quality results!
         if nc.weight < min_weight:
@@ -155,7 +156,8 @@ def generate_feed(min_weight=3):
 
 def generate_human_readable_feed(min_weight, max_weight):
     output = ""
-    for nc in NewsChunks.all():
+    q = db.Query(NewsChunks)
+    for nc in q:
 
         # must be added for quality results!
         x = pickle.loads(nc.entry_data)
