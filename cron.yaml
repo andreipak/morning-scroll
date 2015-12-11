@@ -1,4 +1,8 @@
 cron:
 - description: fetch
   url: /fetch
-  schedule: every 3 hours
+  schedule: every 4 hours
+- description: clear
+  url: /tasks/dbclear
+  schedule: every 3 mins
+  # timezone: KST

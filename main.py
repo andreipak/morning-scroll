@@ -23,6 +23,7 @@ import feedparser
 import datascraper
 import logging
 from google.appengine.ext import db
+from newschunks import NewsChunks
 
 # some constants regarding directories
 PATH_TO_HITLISTS = "hitlists/"
@@ -41,9 +42,13 @@ def fetch(IS_KOREAN):
                 PATH_TO_METALISTS + "en_hitlistnames_general",
                 PATH_TO_METALISTS + "en_hitlistnames_exclusive")
 
+class DBClearHandler(webapp2.RequestHandler):
+    def get(self):
+        db.delete(NewsChunks.all())
+
 class FetchHandler(webapp2.RequestHandler):
     def get(self):
-        # fetch(KOREAN)
+        fetch(KOREAN)
         fetch(ENGLISH)
 
 MINWEIGHT = 3
@@ -64,5 +69,5 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write(datascraper.generate_human_readable_feed(1, 2))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler), ('/rss', RSSHandler), ('/fetch', FetchHandler)
+    ('/', MainHandler), ('/rss', RSSHandler), ('/tasks/dbclear', DBClearHandler), ('/tasks/fetch', FetchHandler)
 ], debug=True)
