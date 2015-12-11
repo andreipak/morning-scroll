@@ -4,8 +4,8 @@ cron:
   schedule: every 4 hours
 - description: mail
   url: /tasks/mail
-  schedule: every 10 mins
+  schedule: every 12 hours
 - description: clear
   url: /tasks/dbclear
-  schedule: every 3 mins
+  schedule: every 24 hours
   # timezone: KST

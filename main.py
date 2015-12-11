@@ -45,7 +45,7 @@ def fetch(IS_KOREAN):
 
 class MailHandler(webapp2.RequestHandler):
     def get(self):
-        mail.send_mail("joshchonpc@gmail.com", "joshcho@stanford.edu", "yo", "this is it")
+        mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Week Whatever", datascraper.generate_human_readable_feed(3, 10))
 
 class DBClearHandler(webapp2.RequestHandler):
     def get(self):
