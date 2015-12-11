@@ -2,6 +2,9 @@ cron:
 - description: fetch
   url: /fetch
   schedule: every 4 hours
+- description: mail
+  url: /tasks/mail
+  schedule: every 10 mins
 - description: clear
   url: /tasks/dbclear
   schedule: every 3 mins

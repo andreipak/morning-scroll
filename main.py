@@ -23,6 +23,7 @@ import feedparser
 import datascraper
 import logging
 from google.appengine.ext import db
+from google.appengine.api import mail
 from newschunks import NewsChunks
 
 # some constants regarding directories
@@ -41,6 +42,10 @@ def fetch(IS_KOREAN):
         datascraper.fetch(PATH_TO_METALISTS + "en_feednames", 
                 PATH_TO_METALISTS + "en_hitlistnames_general",
                 PATH_TO_METALISTS + "en_hitlistnames_exclusive")
+
+class MailHandler(webapp2.RequestHandler):
+    def get(self):
+        mail.send_mail("joshchonpc@gmail.com", "joshcho@stanford.edu", "yo", "this is it")
 
 class DBClearHandler(webapp2.RequestHandler):
     def get(self):
@@ -69,5 +74,5 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write(datascraper.generate_human_readable_feed(1, 2))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler), ('/rss', RSSHandler), ('/tasks/dbclear', DBClearHandler), ('/tasks/fetch', FetchHandler)
+    ('/', MainHandler), ('/rss', RSSHandler), ('/tasks/mail', MailHandler), ('/tasks/dbclear', DBClearHandler), ('/tasks/fetch', FetchHandler)
 ], debug=True)
