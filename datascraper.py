@@ -54,9 +54,11 @@ def get_hitlist_dict(hitlistnames_src):
 # Loads the feeds onto the local (plan: language is either "kr" or "en")
 def load_newschunks(entries, hitlist_general_dict, hitlist_exclusive_dict):
     for new_entry in entries:
-        new_title = new_entry.title
+        if type(new_entry.title) is str and new_entry.title is not None:
+            new_title = new_entry.title
+        else:
+            continue
 
-        # serializes entry into entry_data
         new_nc = NewsChunks(title=new_title, entry_data=pickle.dumps(new_entry))
 
         for hitlistname in hitlist_general_dict:
@@ -109,12 +111,19 @@ def fetch(feednames_src, hitlistnames_general_src, hitlistnames_exclusive_src):
     hitlist_general_dict = get_hitlist_dict(hitlistnames_general_src)
     hitlist_exclusive_dict = get_hitlist_dict(hitlistnames_exclusive_src)
     for url in feednames:
+        # try:
         try:
             rss = feedparser.parse(url)
-            load_newschunks(rss.entries, hitlist_general_dict, hitlist_exclusive_dict)
-            logging.debug(rss.feed.title + " Done")
         except Exception as e:
-            logging.debug(str(e))
+            continue
+        load_newschunks(rss.entries, hitlist_general_dict, hitlist_exclusive_dict)
+        try:
+            logging.debug(rss.feed.title)
+        except Exception as e:
+            print
+        logging.debug(" Done")
+        # except Exception as e:
+        #     logging.debug(e.message)
 
 def generate_feed(min_weight=3):
     items = []
@@ -156,13 +165,13 @@ def generate_feed(min_weight=3):
 
 def generate_human_readable_feed(min_weight, max_weight):
     output = ""
-    q = db.Query(NewsChunks)
+    q = NewsChunks.all()
+    q.filter("weight <", max_weight)
+    q.filter("weight >=", min_weight)
     for nc in q:
 
         # must be added for quality results!
         x = pickle.loads(nc.entry_data)
-        if nc.weight < min_weight or nc.weight >= max_weight:
-            continue
 
         output += "\n\t" + nc.title + " ["
         for hitname in nc.hitnames:

@@ -22,6 +22,7 @@ import cgi
 import feedparser
 import datascraper
 import logging
+from google.appengine.ext import db
 
 # some constants regarding directories
 PATH_TO_HITLISTS = "hitlists/"
@@ -42,7 +43,7 @@ def fetch(IS_KOREAN):
 
 class FetchHandler(webapp2.RequestHandler):
     def get(self):
-        fetch(KOREAN)
+        # fetch(KOREAN)
         fetch(ENGLISH)
 
 MINWEIGHT = 3
@@ -61,8 +62,6 @@ class MainHandler(webapp2.RequestHandler):
         self.response.write(datascraper.generate_human_readable_feed(2, 3))
         self.response.write("\n\t\t\t\t\t============NOT IMPORTANT============\n")
         self.response.write(datascraper.generate_human_readable_feed(1, 2))
-        self.response.write("\n\t\t\t\t\t==============DUPLICATES==============\n")
-        self.response.write(datascraper.generate_human_readable_feed(-1, 0))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler), ('/rss', RSSHandler), ('/fetch', FetchHandler)
