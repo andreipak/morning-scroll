@@ -1,0 +1,53 @@
+@font-face {
+  font-family: Concourse;
+  src: url(ConcourseT6Regular.ttf)
+}
+@font-face {
+  font-family: Equity;
+  src: url(EquityTextARegular.ttf)
+}
+body {
+  font-family: Equity;
+  font-size: 1em;
+  line-height: 1.2;
+}
+.timeline {
+  margin: 100px auto 100px auto;
+  border: 2px solid gray;
+  width: 900px;
+}
+.entry {
+  margin: 50px auto 50px auto;
+  width: 800px;
+}
+
+.story {
+  width: 400px;
+  display: inline-block;
+}
+
+.title {
+  font-family: Concourse;
+  text-transform: capitalize;
+}
+
+.summary {
+  text-align: justify;
+  hyphens: auto;
+}
+
+.info {
+  width: 350px;
+  vertical-align: top;
+  float: right;
+}
+
+.company {
+  font-family: Concourse;
+  text-transform: capitalize;
+}
+
+.facts {
+  text-align: justify;
+  hyphens: auto;
+}
