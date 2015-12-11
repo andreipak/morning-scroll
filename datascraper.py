@@ -54,10 +54,12 @@ def get_hitlist_dict(hitlistnames_src):
 # Loads the feeds onto the local (plan: language is either "kr" or "en")
 def load_newschunks(entries, hitlist_general_dict, hitlist_exclusive_dict):
     for new_entry in entries:
-        if type(new_entry.title) is str and new_entry.title is not None:
-            new_title = new_entry.title
-        else:
+        cond1 = isinstance(new_entry.title, basestring)
+        cond2 = new_entry.title == ""
+        if cond1 and cond2:
             continue
+        else:
+            new_title = new_entry.title
 
         new_nc = NewsChunks(title=new_title, entry_data=pickle.dumps(new_entry))
 
