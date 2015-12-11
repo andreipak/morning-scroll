@@ -23,8 +23,11 @@ import feedparser
 import datascraper
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import logging
 from google.appengine.ext import db
+=======
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 =======
 >>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 =======
@@ -60,12 +63,16 @@ class MainHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/rss+xml'
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         self.response.write("\t\t\t\t\t==============IMPORTANT==============\n")
         self.response.write(datascraper.generate_human_readable_feed(3, 10))
         self.response.write("\n\t\t\t\t\t===========ALMOST IMPORTANT===========\n")
         self.response.write(datascraper.generate_human_readable_feed(2, 3))
         self.response.write("\n\t\t\t\t\t============NOT IMPORTANT============\n")
         self.response.write(datascraper.generate_human_readable_feed(1, 2))
+=======
+        self.response.write(datascraper.generate_feed(MINWEIGHT))
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 =======
         self.response.write(datascraper.generate_feed(MINWEIGHT))
 >>>>>>> parent of 8270007... version 3.0 english algorithm optimized
