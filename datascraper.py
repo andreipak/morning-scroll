@@ -65,6 +65,7 @@ def load_newschunks(entries, hitlist_dict):
             continue
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         new_nc = NewsChunks(title=new_title, entry_data=pickle.dumps(new_entry))
 
         for hitlistname in hitlist_general_dict:
@@ -88,6 +89,8 @@ def load_newschunks(entries, hitlist_dict):
         if new_nc.weight == 0:
             continue
 
+=======
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 =======
 >>>>>>> parent of 8270007... version 3.0 english algorithm optimized
         match_nc = None
@@ -129,6 +132,11 @@ def fetch(feednames_src, hitlistnames_src):
         try:
             rss = feedparser.parse(url)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            load_newschunks(rss.entries, hitlist_dict)
+            logging.debug("Done")
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 =======
             load_newschunks(rss.entries, hitlist_dict)
             logging.debug("Done")
@@ -183,6 +191,7 @@ def generate_feed(min_weight=3):
     return rss.to_xml(encoding="utf-8")
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 def generate_human_readable_feed(min_weight, max_weight):
     output = ""
     q = NewsChunks.all()
@@ -201,6 +210,8 @@ def generate_human_readable_feed(min_weight, max_weight):
 
     return output
 
+=======
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 =======
 >>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 if __name__ == '__main__':

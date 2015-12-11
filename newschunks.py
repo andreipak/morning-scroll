@@ -14,4 +14,7 @@ class NewsChunks(db.Model):
     entry_data = db.BlobProperty(required=True)
     weight = db.IntegerProperty(default=0)
     hitnames = db.ListProperty(str)
+<<<<<<< HEAD
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
+=======
 >>>>>>> parent of 8270007... version 3.0 english algorithm optimized
