@@ -5,7 +5,13 @@
 from google.appengine.ext import db
 
 class NewsChunks(db.Model):
+<<<<<<< HEAD
     entry_data = db.BlobProperty(required = True)
     weight     = db.IntegerProperty(default = 0)
     hitnames   = db.ListProperty(str)
     title      = db.StringProperty(required = True)
+=======
+    entry_data = db.BlobProperty(required=True)
+    weight = db.IntegerProperty(default=0)
+    hitnames = db.ListProperty(str)
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized

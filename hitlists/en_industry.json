@@ -1,11 +1,11 @@
 {"en_industry": [
-  {"title": "food",       "weight": 1},
-  {"title": "foodtech",   "weight": 2},
+  {"title": "food",       "weight": 2},
   {"title": "delivery",   "weight": 2},
   {"title": "meal",       "weight": 2},
-  {"title": "restaurant", "weight": 1},
-  {"title": "kitchen",    "weight": 1},
-  {"title": "dinner",     "weight": 1},
-  {"title": "lunch",      "weight": 1},
-  {"title": "breakfast",  "weight": 1}
+  {"title": "restaurant", "weight": 2},
+  {"title": "kitchen",    "weight": 2},
+  {"title": "dinner",     "weight": 2},
+  {"title": "lunch",      "weight": 2},
+  {"title": "on-demand",      "weight": 2},
+  {"title": "breakfast",  "weight": 2}
 ]}

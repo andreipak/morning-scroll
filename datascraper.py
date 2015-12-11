@@ -25,11 +25,16 @@ import logging # debugging
 # some constants regarding directories
 PATH_TO_HITLISTS = "hitlists/"
 HITLIST_EXTENSION = ".json"
+PATH_TO_METALISTS = "metalists/"
+
+# some constants, will be part of the object declaration
+feednames_src = PATH_TO_METALISTS + "en_feednames"
+hitlistnames_src = PATH_TO_METALISTS + "en_hitlistnames"
 
 # threshold for difflib calculation
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
 # more
-DUPLICATE_THRESHOLD = 0.6
+DUPLICATE_THRESHOLD = 0.44
 
 def get_list_of(names_src):
     names = []
@@ -52,13 +57,14 @@ def get_hitlist_dict(hitlistnames_src):
     return hitlist_dict
 
 # Loads the feeds onto the local (plan: language is either "kr" or "en")
-def load_newschunks(entries, hitlist_general_dict, hitlist_exclusive_dict):
+def load_newschunks(entries, hitlist_dict):
     for new_entry in entries:
         if type(new_entry.title) is str and new_entry.title is not None:
             new_title = new_entry.title
         else:
             continue
 
+<<<<<<< HEAD
         new_nc = NewsChunks(title=new_title, entry_data=pickle.dumps(new_entry))
 
         for hitlistname in hitlist_general_dict:
@@ -82,38 +88,51 @@ def load_newschunks(entries, hitlist_general_dict, hitlist_exclusive_dict):
         if new_nc.weight == 0:
             continue
 
+=======
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
         match_nc = None
 
-        q = db.Query(NewsChunks)
-        best_match_ratio = DUPLICATE_THRESHOLD
-        for nc in q:
-            existing_title = nc.title
+        q = db.Query(NewsChunks,keys_only=True)
+
+        for key in q:
+            existing_title = str(key)
+            logging.debug(existing_title)
             # checks for duplicates with sequence matcher
             ratio = difflib.SequenceMatcher(None, new_title, existing_title).ratio()
-            if ratio > best_match_ratio:
-                if nc.weight >= new_nc.weight:
-                    return
-                else:
-                    best_match_ratio = ratio
-                    match_nc = nc
+            if ratio > DUPLICATE_THRESHOLD:
+                match_nc = NewsChunks.get(existing_title)
+                break
+
+        # serializes entry into entry_data
+        new_nc = NewsChunks(key_name=new_title, entry_data=pickle.dumps(new_entry))
+
+        for hitlistname in hitlist_dict:
+            for hit in hitlist_dict[hitlistname]:
+                if hit["title"] in new_title.lower(): # it's a hit!
+                    new_nc.hitnames.append(hit["title"])
+                    new_nc.weight += hit["weight"]
 
         if match_nc is None:
             # unique nc
             new_nc.put()
-        else:
+        elif new_nc.weight > match_nc.weight:
             # similar, but new_nc is heavier
             match_nc.delete()
             new_nc.put()
 
 # load all the feeds, then clear newschunks
-def fetch(feednames_src, hitlistnames_general_src, hitlistnames_exclusive_src):
+def fetch(feednames_src, hitlistnames_src):
     feednames = get_list_of(feednames_src)
-    hitlist_general_dict = get_hitlist_dict(hitlistnames_general_src)
-    hitlist_exclusive_dict = get_hitlist_dict(hitlistnames_exclusive_src)
+    hitlist_dict = get_hitlist_dict(hitlistnames_src)
     for url in feednames:
         # try:
         try:
             rss = feedparser.parse(url)
+<<<<<<< HEAD
+=======
+            load_newschunks(rss.entries, hitlist_dict)
+            logging.debug("Done")
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
         except Exception as e:
             continue
         load_newschunks(rss.entries, hitlist_general_dict, hitlist_exclusive_dict)
@@ -163,6 +182,7 @@ def generate_feed(min_weight=3):
 
     return rss.to_xml(encoding="utf-8")
 
+<<<<<<< HEAD
 def generate_human_readable_feed(min_weight, max_weight):
     output = ""
     q = NewsChunks.all()
@@ -181,5 +201,7 @@ def generate_human_readable_feed(min_weight, max_weight):
 
     return output
 
+=======
+>>>>>>> parent of 8270007... version 3.0 english algorithm optimized
 if __name__ == '__main__':
     main()
