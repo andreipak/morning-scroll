@@ -11,24 +11,11 @@ body {
   font-size: 1em;
   line-height: 1.2;
 }
-/* .timeline { */
-/*   margin: 100px auto 100px auto; */
-/*   border: 2px solid gray; */
-/*   width: 900px; */
-/* } */
-.feature_img {
-  max-height: 100px;
-}
 
 .contents {
+  margin: 20px 20px 20px 20px;
   display: inline-block;
   max-width: 500px;
-}
-
-.entry {
-  padding: 30px 30px 30px 30px;
-  margin: 40px auto 40px auto;
-  border: 2px solid gray;
 }
 
 .title {
@@ -46,6 +33,4 @@ body {
   display: inline-block;
   float: right;
   color: green;
-  padding: 3px 3px 3px 3px;
-  border: 1px solid black;
 }

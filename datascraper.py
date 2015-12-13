@@ -188,6 +188,16 @@ def generate_human_readable_feed(min_weight, max_weight):
 
     return output
 
+def kill_source(summary):
+    TARGET = '"source"'
+    source_index = summary.find(TARGET)
+    begin_index = summary[source_index:].find(">")
+    end_index = summary[source_index + begin_index:].find("<")
+    if begin_index == -1 or source_index == -1 or end_index == -1:
+        return summary
+    else:
+        return summary[:source_index + begin_index + 1] + summary[source_index + begin_index + end_index:]
+
 def kill_html(summary):
     # this just destroys any well-paired brackets and things inside them
     result = ""
@@ -230,6 +240,19 @@ def escape_html(s):
     s = s.replace('"', "&quot;")
     return s
 
+def get_feature_img(summary):
+    begin = summary.find("<img")
+    end = summary[begin:].find("/>")
+    if begin == -1 or end == -1:
+        return ""
+    img_tag = summary[begin:begin+end]
+    style_index = img_tag.find('style="')
+    if style_index == -1:
+        return img_tag + 'style="width:100%"/>'
+    else:
+        style_index += len('style="')
+        return img_tag[:style_index] + "width:100%;" + img_tag[style_index:] + "/>"
+
 def generate_html(min_weight, max_weight):
     form="""
 <!DOCTYPE html>
@@ -237,31 +260,27 @@ def generate_html(min_weight, max_weight):
   <head>
     <!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
+    <title>Weekly Digest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css"/>
     <style>
 @font-face {
   font-family: Concourse;
-  src: url(ConcourseT6Regular.ttf)
+  src: url(https://morning-scroll2.appspot.com/ConcourseT6Regular.ttf)
 }
 @font-face {
   font-family: Equity;
-  src: url(EquityTextARegular.ttf)
+  src: url(https://morning-scroll2.appspot.com/EquityTextARegular.ttf)
 }
 body {
   font-family: Equity;
   font-size: 1em;
   line-height: 1.2;
 }
-/* .timeline { */
-/*   margin: 100px auto 100px auto; */
-/*   border: 2px solid gray; */
-/*   width: 900px; */
-/* } */
-.entry {
-  max-width: 600px;
-  min-width: 300px;
-  padding: 30px 30px 30px 30px;
-  margin: 40px auto 40px auto;
-  border: 2px solid gray;
+
+.contents {
+  margin: 20px 20px 20px 20px;
+  display: inline-block;
 }
 
 .title {
@@ -273,17 +292,29 @@ body {
   text-align: justify;
   hyphens: auto;
   margin: 5px auto 5px auto;
+  position: relative;
+  overflow: hidden;
+  font-size:.9em;
+  max-height: 101px;
+  color: gray;
+}
+
+.summary:before {
+  content:'';
+  width:100%;
+  height:100%;
+  position:absolute;
+  left:0;
+  top:0;
+  background:linear-gradient(transparent 70px, white);
 }
 
 .keywords {
   display: inline-block;
   float: right;
   color: green;
-  padding: 3px 3px 3px 3px;
-  border: 1px solid black;
 }
-</style>
-    <title>Weekly Digest</title>
+  </style>
   </head>
   <body>
 """
@@ -295,20 +326,26 @@ body {
         # must be added for quality results!
         x = pickle.loads(nc.entry_data)
         form += """
-        <div class="entry">
+        <div class="w3-card-4" style="width: 80%; max-width: 500px; margin: 30px auto 30px auto">
         """
+        form += get_feature_img(x.summary) + "\n"
+        form += "<div class='contents'>\n"
         form += '<a class="title">' + escape_html(x.title) + "</a>\n"
-        form += '<div class="summary">' + kill_html(x.summary) + "</div>\n"
+        # print x.summary
+        # print
+        # print
+        form += '<div class="summary">' + kill_html(kill_source(x.summary)) + "</div>\n"
         form += '<a class="link" href="' + escape_html(x.link) + '">'
         form += escape_html(nc.feed_title) + "</a>\n"
         form += '<div class="keywords">'
         first = True
         for hitname in nc.hitnames:
             if first:
-                form += escape_html(hitname)
+                form += escape_html(hitname.upper())
                 first = False
             else:
-                form += ", " + escape_html(hitname)
+                form += ", " + escape_html(hitname.upper())
+        form += "</div>\n"
         form += "</div>\n"
         form += "</div>\n"
 
