@@ -1,6 +1,6 @@
 cron:
 - description: fetch
-  url: /fetch
+  url: /tasks/fetch
   schedule: every 4 hours
 - description: mail
   url: /tasks/mail

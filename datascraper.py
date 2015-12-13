@@ -52,7 +52,7 @@ def get_hitlist_dict(hitlistnames_src):
     return hitlist_dict
 
 # Loads the feeds onto the local (plan: language is either "kr" or "en")
-def load_newschunks(entries, hitlist_general_dict, hitlist_exclusive_dict):
+def load_newschunks(entries, feed_title, hitlist_general_dict, hitlist_exclusive_dict):
     for new_entry in entries:
         cond1 = isinstance(new_entry.title, basestring)
         cond2 = new_entry.title == ""
@@ -61,7 +61,7 @@ def load_newschunks(entries, hitlist_general_dict, hitlist_exclusive_dict):
         else:
             new_title = new_entry.title
 
-        new_nc = NewsChunks(title=new_title, entry_data=pickle.dumps(new_entry))
+        new_nc = NewsChunks(title=new_title,feed_title=feed_title, entry_data=pickle.dumps(new_entry))
 
         for hitlistname in hitlist_general_dict:
             for hit in hitlist_general_dict[hitlistname]:
@@ -118,12 +118,17 @@ def fetch(feednames_src, hitlistnames_general_src, hitlistnames_exclusive_src):
             rss = feedparser.parse(url)
         except Exception as e:
             continue
-        load_newschunks(rss.entries, hitlist_general_dict, hitlist_exclusive_dict)
+
+        feed_title = "Source"
         try:
-            logging.debug(rss.feed.title)
+            feed_title = rss.feed.title
         except Exception as e:
-            print
-        logging.debug(" Done")
+            return
+        if feed_title == "Feedburner":
+            feed_title = "Business Insider"
+
+        load_newschunks(rss.entries, feed_title, hitlist_general_dict, hitlist_exclusive_dict)
+        logging.debug(feed_title + " Done")
         # except Exception as e:
         #     logging.debug(e.message)
 
@@ -182,6 +187,136 @@ def generate_human_readable_feed(min_weight, max_weight):
         output += "\t"+x.link+"\n"
 
     return output
+
+def kill_html(summary):
+    # this just destroys any well-paired brackets and things inside them
+    result = ""
+    num_lefts = 0
+    while True:
+        if num_lefts == 0:
+            left_index = summary.find("<")
+            right_index = summary.find(">")
+
+            if left_index == -1 or right_index == -1:
+                result += summary
+                return result
+
+            result += summary[:left_index]
+            if left_index < right_index:
+                num_lefts += summary[left_index+1:right_index].count('<')
+                summary = summary[right_index+1:]
+            else:
+                summary = summary[left_index:]
+
+        else:
+            right_index = summary.find(">")
+
+            if right_index == -1:
+                result += summary
+                return result
+
+            if left_index < right_index:
+                num_lefts += summary[left_index+1:right_index].count('<')
+            else:
+                num_lefts -= 1
+            summary = summary[right_index+1:]
+
+    return result
+
+def escape_html(s):
+    s = s.replace('&', "&amp;")
+    s = s.replace('>', "&gt;")
+    s = s.replace('<', "&lt;")
+    s = s.replace('"', "&quot;")
+    return s
+
+def generate_html(min_weight, max_weight):
+    form="""
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> -->
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
+    <style>
+@font-face {
+  font-family: Concourse;
+  src: url(ConcourseT6Regular.ttf)
+}
+@font-face {
+  font-family: Equity;
+  src: url(EquityTextARegular.ttf)
+}
+body {
+  font-family: Equity;
+  font-size: 1em;
+  line-height: 1.2;
+}
+/* .timeline { */
+/*   margin: 100px auto 100px auto; */
+/*   border: 2px solid gray; */
+/*   width: 900px; */
+/* } */
+.entry {
+  max-width: 600px;
+  min-width: 300px;
+  padding: 30px 30px 30px 30px;
+  margin: 40px auto 40px auto;
+  border: 2px solid gray;
+}
+
+.title {
+  font-family: Concourse;
+  text-transform: capitalize;
+}
+
+.summary {
+  text-align: justify;
+  hyphens: auto;
+  margin: 5px auto 5px auto;
+}
+
+.keywords {
+  display: inline-block;
+  float: right;
+  color: green;
+  padding: 3px 3px 3px 3px;
+  border: 1px solid black;
+}
+</style>
+    <title>Weekly Digest</title>
+  </head>
+  <body>
+"""
+    q = NewsChunks.all()
+    q.filter("weight <", max_weight)
+    q.filter("weight >=", min_weight)
+    for nc in q:
+
+        # must be added for quality results!
+        x = pickle.loads(nc.entry_data)
+        form += """
+        <div class="entry">
+        """
+        form += '<a class="title">' + escape_html(x.title) + "</a>\n"
+        form += '<div class="summary">' + kill_html(x.summary) + "</div>\n"
+        form += '<a class="link" href="' + escape_html(x.link) + '">'
+        form += escape_html(nc.feed_title) + "</a>\n"
+        form += '<div class="keywords">'
+        first = True
+        for hitname in nc.hitnames:
+            if first:
+                form += escape_html(hitname)
+                first = False
+            else:
+                form += ", " + escape_html(hitname)
+        form += "</div>\n"
+        form += "</div>\n"
+
+    form += """
+  </body>
+</html>
+"""
+    return form
 
 if __name__ == '__main__':
     main()

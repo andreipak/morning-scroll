@@ -11,19 +11,24 @@ body {
   font-size: 1em;
   line-height: 1.2;
 }
-.timeline {
-  margin: 100px auto 100px auto;
-  border: 2px solid gray;
-  width: 900px;
-}
-.entry {
-  margin: 50px auto 50px auto;
-  width: 800px;
+/* .timeline { */
+/*   margin: 100px auto 100px auto; */
+/*   border: 2px solid gray; */
+/*   width: 900px; */
+/* } */
+.feature_img {
+  max-height: 100px;
 }
 
-.story {
-  width: 400px;
+.contents {
   display: inline-block;
+  max-width: 500px;
+}
+
+.entry {
+  padding: 30px 30px 30px 30px;
+  margin: 40px auto 40px auto;
+  border: 2px solid gray;
 }
 
 .title {
@@ -34,20 +39,13 @@ body {
 .summary {
   text-align: justify;
   hyphens: auto;
+  margin: 5px auto 5px auto;
 }
 
-.info {
-  width: 350px;
-  vertical-align: top;
+.keywords {
+  display: inline-block;
   float: right;
-}
-
-.company {
-  font-family: Concourse;
-  text-transform: capitalize;
-}
-
-.facts {
-  text-align: justify;
-  hyphens: auto;
+  color: green;
+  padding: 3px 3px 3px 3px;
+  border: 1px solid black;
 }
