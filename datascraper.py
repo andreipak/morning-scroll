@@ -29,12 +29,14 @@ HITLIST_EXTENSION = ".json"
 # threshold for difflib calculation
 # 0.44 seems to catch most things, could be improved by weighting our hit-terms
 # more
-DUPLICATE_THRESHOLD = 0.6
+DUPLICATE_THRESHOLD = 0.5
 
 def get_list_of(names_src):
     names = []
     with open(names_src) as f:
         names.extend(f.read().splitlines())
+    # follows python commenting
+    names = [x for x in names if not x.startswith('#')]
     return names
 
 def get_hitlist_dict(hitlistnames_src):
@@ -54,12 +56,22 @@ def get_hitlist_dict(hitlistnames_src):
 # Loads the feeds onto the local (plan: language is either "kr" or "en")
 def load_newschunks(entries, feed_title, hitlist_general_dict, hitlist_exclusive_dict):
     for new_entry in entries:
+        if "shutterstock" in new_entry.link:
+            break
+        if "dribbble" in new_entry.link:
+            break
+        if "craigslist" in new_entry.link:
+            break
+
         cond1 = isinstance(new_entry.title, basestring)
         cond2 = new_entry.title == ""
         if cond1 and cond2:
             continue
         else:
             new_title = new_entry.title
+
+        if "Stock Update" in new_title:
+            break
 
         new_nc = NewsChunks(title=new_title,feed_title=feed_title, entry_data=pickle.dumps(new_entry))
 
@@ -113,17 +125,17 @@ def fetch(feednames_src, hitlistnames_general_src, hitlistnames_exclusive_src):
     hitlist_general_dict = get_hitlist_dict(hitlistnames_general_src)
     hitlist_exclusive_dict = get_hitlist_dict(hitlistnames_exclusive_src)
     for url in feednames:
-        # try:
         try:
             rss = feedparser.parse(url)
-        except Exception as e:
+        except ValueError:
+            logging.debug("errored")
             continue
 
-        feed_title = "Source"
+        feed_title = ""
         try:
             feed_title = rss.feed.title
-        except Exception as e:
-            return
+        except AttributeError:
+            feed_title = "Source"
         if feed_title == "Feedburner":
             feed_title = "Business Insider"
 
@@ -248,7 +260,7 @@ def get_feature_img(summary):
     img_tag = summary[begin:begin+end]
     style_index = img_tag.find('style="')
     if style_index == -1:
-        return img_tag + 'style="width:100%"/>'
+        return img_tag + 'style="width:100%;"/>'
     else:
         style_index += len('style="')
         return img_tag[:style_index] + "width:100%;" + img_tag[style_index:] + "/>"
@@ -328,9 +340,11 @@ body {
         form += """
         <div class="w3-card-4" style="width: 80%; max-width: 500px; margin: 30px auto 30px auto">
         """
-        form += get_feature_img(x.summary) + "\n"
+        form += '<div style= "max-height:300px; overflow:hidden;">'
+        form += get_feature_img(x.summary)
+        form += '</div>\n'
         form += "<div class='contents'>\n"
-        form += '<a class="title">' + escape_html(x.title) + "</a>\n"
+        form += '<a class="title">' + escape_html(kill_html(x.title)) + "</a>\n"
         # print x.summary
         # print
         # print

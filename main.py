@@ -45,7 +45,7 @@ def fetch(IS_KOREAN):
 
 class MailHandler(webapp2.RequestHandler):
     def get(self):
-        mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Week Whatever", datascraper.generate_human_readable_feed(3, 10))
+        mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Week Whatever", datascraper.generate_html(3, 20))
 
 class DBClearHandler(webapp2.RequestHandler):
     def get(self):
@@ -65,7 +65,7 @@ class RSSHandler(webapp2.RequestHandler):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write(datascraper.generate_html(1, 4))
+        self.response.write(datascraper.generate_html(3, 10))
         # self.response.headers['Content-Type'] = 'application/rss+xml'
         # self.response.write("\t\t\t\t\t==============IMPORTANT==============\n")
         # self.response.write(datascraper.generate_human_readable_feed(3, 10))
