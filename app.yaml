@@ -9,6 +9,18 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
+- url: /w3.css
+  static_files: w3.css
+  upload: w3.css
+
+- url: /ConcourseT6Regular.ttf
+  static_files: ConcourseT6Regular.ttf
+  upload: ConcourseT6Regular.ttf
+
+- url: /EquityTextARegular.ttf
+  static_files: EquityTextARegular.ttf
+  upload: EquityTextARegular.ttf
+
 - url: .*
   script: main.app
 

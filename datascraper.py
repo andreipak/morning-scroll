@@ -274,12 +274,21 @@ def generate_html(min_weight, max_weight):
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"/> -->
     <title>Weekly Digest</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css"/>
+    <link rel="stylesheet" href="https://morning-scroll2.appspot.com/w3.css"/>
     <link href='https://fonts.googleapis.com/css?family=Crimson+Text' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
     <style>
+@font-face {
+  font-family: Concourse;
+  src: url(ConcourseT6Regular.ttf)
+}
+@font-face {
+  font-family: Equity;
+  src: url(EquityTextARegular.ttf)
+}
+
 body {
-  font-family: 'Crimson Text', serif;
+  font-family: Equity, 'Crimson Text', serif;
   font-size: 1em;
   line-height: 1.3;
 }
@@ -290,7 +299,7 @@ body {
 }
 
 .title {
-  font-family: 'Source Sans Pro', sans-serif;
+  font-family: Concourse, 'Source Sans Pro', sans-serif;
   font-weight: 700;
 }
 

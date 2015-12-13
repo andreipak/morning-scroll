@@ -1,13 +1,13 @@
 cron:
 - description: fetch
   url: /tasks/fetch
-  schedule: every monday 04:00
-  timezone: KST
+  schedule: every day 04:00
+  timezone: Asia/Seoul
 - description: mail
   url: /tasks/mail
   schedule: every monday 09:00
-  timezone: KST
+  timezone: Asia/Seoul
 - description: clear
   url: /tasks/dbclear
   schedule: every monday 13:00
-  timezone: KST
+  timezone: Asia/Seoul
