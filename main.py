@@ -63,9 +63,13 @@ class RSSHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/rss+xml'
         self.response.write(datascraper.generate_feed(MINWEIGHT))
 
+class DebugHandler(webapp2.RequestHandler):
+    def get(self):
+        self.response.write(datascraper.generate_html(2, 3))
+
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write(datascraper.generate_html(3, 10))
+        self.response.write(datascraper.generate_html(3, 15))
         # self.response.headers['Content-Type'] = 'application/rss+xml'
         # self.response.write("\t\t\t\t\t==============IMPORTANT==============\n")
         # self.response.write(datascraper.generate_human_readable_feed(3, 10))
@@ -75,5 +79,5 @@ class MainHandler(webapp2.RequestHandler):
         # self.response.write(datascraper.generate_human_readable_feed(1, 2))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler), ('/rss', RSSHandler), ('/tasks/mail', MailHandler), ('/tasks/dbclear', DBClearHandler), ('/tasks/fetch', FetchHandler)
+    ('/', MainHandler), ('/debug', DebugHandler), ('/rss', RSSHandler), ('/tasks/mail', MailHandler), ('/tasks/dbclear', DBClearHandler), ('/tasks/fetch', FetchHandler)
 ], debug=True)

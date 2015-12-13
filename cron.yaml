@@ -1,11 +1,13 @@
 cron:
 - description: fetch
   url: /tasks/fetch
-  schedule: every 4 hours
+  schedule: every monday 04:00
+  timezone: KST
 - description: mail
   url: /tasks/mail
-  schedule: every 12 hours
+  schedule: every monday 09:00
+  timezone: KST
 - description: clear
   url: /tasks/dbclear
-  schedule: every 24 hours
-  # timezone: KST
+  schedule: every monday 13:00
+  timezone: KST

@@ -275,19 +275,13 @@ def generate_html(min_weight, max_weight):
     <title>Weekly Digest</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css"/>
+    <link href='https://fonts.googleapis.com/css?family=Crimson+Text' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
     <style>
-@font-face {
-  font-family: Concourse;
-  src: url(https://morning-scroll2.appspot.com/ConcourseT6Regular.ttf)
-}
-@font-face {
-  font-family: Equity;
-  src: url(https://morning-scroll2.appspot.com/EquityTextARegular.ttf)
-}
 body {
-  font-family: Equity;
+  font-family: 'Crimson Text', serif;
   font-size: 1em;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .contents {
@@ -296,8 +290,8 @@ body {
 }
 
 .title {
-  font-family: Concourse;
-  text-transform: capitalize;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 700;
 }
 
 .summary {
@@ -351,15 +345,15 @@ body {
         form += '<div class="summary">' + kill_html(kill_source(x.summary)) + "</div>\n"
         form += '<a class="link" href="' + escape_html(x.link) + '">'
         form += escape_html(nc.feed_title) + "</a>\n"
-        form += '<div class="keywords">'
-        first = True
-        for hitname in nc.hitnames:
-            if first:
-                form += escape_html(hitname.upper())
-                first = False
-            else:
-                form += ", " + escape_html(hitname.upper())
-        form += "</div>\n"
+        # form += '<div class="keywords">'
+        # first = True
+        # for hitname in nc.hitnames:
+        #     if first:
+        #         form += escape_html(hitname.upper())
+        #         first = False
+        #     else:
+        #         form += ", " + escape_html(hitname.upper())
+        # form += "</div>\n"
         form += "</div>\n"
         form += "</div>\n"
 
