@@ -45,7 +45,7 @@ def fetch(IS_KOREAN):
 
 class MailHandler(webapp2.RequestHandler):
     def get(self):
-        mail.send_mail("joshchonpc@gmail.com", "corpdev@woowahan.com", "Weekly Report", "Hi all, the following are the big foodtech news of the past week. A prettier version is on morning-scroll2.appspot.com\n" + datascraper.generate_human_readable_feed(3, 15))
+        mail.send_mail("joshchonpc@gmail.com", "jaykim@woowahan.com", "Weekly Report", "Hi all, the following are the big foodtech news of the past week. A prettier version is on morning-scroll2.appspot.com\n" + datascraper.generate_human_readable_feed(3, 15))
 
 class ArchiveMailHandler(webapp2.RequestHandler):
     def get(self):
