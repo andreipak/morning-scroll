@@ -45,6 +45,10 @@ def fetch(IS_KOREAN):
 
 class MailHandler(webapp2.RequestHandler):
     def get(self):
+        mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Weekly Report", "Hi all, the following are the big foodtech news of the past week. A prettier version is on morning-scroll2.appspot.com\n" + datascraper.generate_human_readable_feed(3, 15))
+
+class ArchiveMailHandler(webapp2.RequestHandler):
+    def get(self):
         mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Weekly Report", datascraper.generate_human_readable_feed(3, 15))
 
 class DBClearHandler(webapp2.RequestHandler):
@@ -79,5 +83,6 @@ class MainHandler(webapp2.RequestHandler):
         # self.response.write(datascraper.generate_human_readable_feed(1, 2))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler), ('/debug', DebugHandler), ('/rss', RSSHandler), ('/tasks/mail', MailHandler), ('/tasks/dbclear', DBClearHandler), ('/tasks/fetch', FetchHandler)
+    ('/', MainHandler), ('/debug', DebugHandler), ('/rss', RSSHandler),
+    ('/tasks/archive_mail', ArchiveMailHandler), ('/tasks/mail', MailHandler), ('/tasks/dbclear', DBClearHandler), ('/tasks/fetch', FetchHandler)
 ], debug=True)

@@ -3,6 +3,10 @@ cron:
   url: /tasks/fetch
   schedule: every day 04:00
   timezone: Asia/Seoul
+- description: archive_mail
+  url: /tasks/archive_mail
+  schedule: every monday 08:45
+  timezone: Asia/Seoul
 - description: mail
   url: /tasks/mail
   schedule: every monday 09:00

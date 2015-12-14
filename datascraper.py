@@ -62,6 +62,8 @@ def load_newschunks(entries, feed_title, hitlist_general_dict, hitlist_exclusive
             break
         if "craigslist" in new_entry.link:
             break
+        if "job" in new_entry.link:
+            break
 
         cond1 = isinstance(new_entry.title, basestring)
         cond2 = new_entry.title == ""
