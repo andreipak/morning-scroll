@@ -166,9 +166,9 @@ def generate_feed(min_weight=3):
 
     # feed generation!
     rss = PyRSS2Gen.RSS2(
-            title = "The Feed, y",
-            link = "https://morning-scroll.appspot.com",
-            description = "This is a feed",
+            title = "Foodtech News of This Week",
+            link = "https://morning-scroll2.appspot.com/rss",
+            description = "By Josh Cho",
 
             language = "en",
             copyright = "",
