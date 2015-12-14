@@ -192,7 +192,7 @@ def generate_human_readable_feed(min_weight, max_weight):
         # must be added for quality results!
         x = pickle.loads(nc.entry_data)
 
-        output += "\n\t" + nc.title + " ["
+        output += "\n\t" + kill_html(nc.title) + " ["
         for hitname in nc.hitnames:
             output += " " + hitname
         output += " ]\n"
@@ -265,7 +265,7 @@ def get_feature_img(summary):
         style_index += len('style="')
         return img_tag[:style_index] + "width:100%;" + img_tag[style_index:] + "/>"
 
-def generate_html(min_weight, max_weight):
+def generate_html(min_weight, max_weight, show_hits):
     form="""
 <!DOCTYPE html>
 <html lang="en">
@@ -354,15 +354,16 @@ body {
         form += '<div class="summary">' + kill_html(kill_source(x.summary)) + "</div>\n"
         form += '<a class="link" href="' + escape_html(x.link) + '">'
         form += escape_html(nc.feed_title) + "</a>\n"
-        # form += '<div class="keywords">'
-        # first = True
-        # for hitname in nc.hitnames:
-        #     if first:
-        #         form += escape_html(hitname.upper())
-        #         first = False
-        #     else:
-        #         form += ", " + escape_html(hitname.upper())
-        # form += "</div>\n"
+        if show_hits:
+            form += '<div class="keywords">'
+            first = True
+            for hitname in nc.hitnames:
+                if first:
+                    form += escape_html(hitname.upper())
+                    first = False
+                else:
+                    form += ", " + escape_html(hitname.upper())
+            form += "</div>\n"
         form += "</div>\n"
         form += "</div>\n"
 

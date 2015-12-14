@@ -65,11 +65,11 @@ class RSSHandler(webapp2.RequestHandler):
 
 class DebugHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write(datascraper.generate_html(2, 3))
+        self.response.write(datascraper.generate_html(2, 3, True))
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write(datascraper.generate_html(3, 15))
+        self.response.write(datascraper.generate_html(3, 15, False))
         # self.response.headers['Content-Type'] = 'application/rss+xml'
         # self.response.write("\t\t\t\t\t==============IMPORTANT==============\n")
         # self.response.write(datascraper.generate_human_readable_feed(3, 10))

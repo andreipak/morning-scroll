@@ -2,6 +2,7 @@
   {"title": "food",       "weight": 1},
   {"title": "foodtech",   "weight": 2},
   {"title": "delivery",   "weight": 2},
+  {"title": "food delivery",   "weight": 3},
   {"title": "meal",       "weight": 2},
   {"title": "restaurant", "weight": 1},
   {"title": "kitchen",    "weight": 1},

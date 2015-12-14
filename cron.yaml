@@ -9,5 +9,5 @@ cron:
   timezone: Asia/Seoul
 - description: clear
   url: /tasks/dbclear
-  schedule: every monday 13:00
+  schedule: every monday 21:00
   timezone: Asia/Seoul
