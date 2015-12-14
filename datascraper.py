@@ -323,7 +323,6 @@ body {
   position:absolute;
   left:0;
   top:0;
-  background:linear-gradient(transparent 70px, white);
 }
 
 .keywords {

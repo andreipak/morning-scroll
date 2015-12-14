@@ -45,10 +45,11 @@ def fetch(IS_KOREAN):
 
 class MailHandler(webapp2.RequestHandler):
     def get(self):
-        mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Weekly Report", "Hi all, the following are the big foodtech news of the past week. A prettier version is on morning-scroll2.appspot.com\n" + datascraper.generate_human_readable_feed(3, 15))
+        mail.send_mail("joshchonpc@gmail.com", "corpdev@woowahan.com", "Weekly Report", "Hi all, the following are the big foodtech news of the past week. A prettier version is on morning-scroll2.appspot.com\n" + datascraper.generate_human_readable_feed(3, 15))
 
 class ArchiveMailHandler(webapp2.RequestHandler):
     def get(self):
+        mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Weekly Report Debug", datascraper.generate_human_readable_feed(2, 3))
         mail.send_mail("joshchonpc@gmail.com", "joshchonpc@gmail.com", "Weekly Report", datascraper.generate_human_readable_feed(3, 15))
 
 class DBClearHandler(webapp2.RequestHandler):
@@ -74,13 +75,6 @@ class DebugHandler(webapp2.RequestHandler):
 class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.response.write(datascraper.generate_html(3, 15, False))
-        # self.response.headers['Content-Type'] = 'application/rss+xml'
-        # self.response.write("\t\t\t\t\t==============IMPORTANT==============\n")
-        # self.response.write(datascraper.generate_human_readable_feed(3, 10))
-        # self.response.write("\n\t\t\t\t\t===========ALMOST IMPORTANT===========\n")
-        # self.response.write(datascraper.generate_human_readable_feed(2, 3))
-        # self.response.write("\n\t\t\t\t\t============NOT IMPORTANT============\n")
-        # self.response.write(datascraper.generate_human_readable_feed(1, 2))
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler), ('/debug', DebugHandler), ('/rss', RSSHandler),
